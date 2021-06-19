@@ -5,3 +5,5 @@
 ----
 
 WurstMod is a **mod** for Roblox, inspired by Wurst for Minecraft™
+
+**Do you have any ideas/reports etc.? Contact us [here](https://github.com/WurstMod/Wurst/issues/new)**
