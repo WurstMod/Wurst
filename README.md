@@ -13,6 +13,9 @@ WurstMod is a **mod** for Roblox, inspired by Wurst for Minecraft™
 loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/main/script.lua")
 ```
 
+# Choosing Different Versions
+comming soon.
+
 # Controls
 - RControl - toggle gui
 #### Module
