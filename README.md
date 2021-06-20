@@ -16,5 +16,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/main/s
 # Controls
 - RControl - toggle gui
 #### Module
-- LeftClick - toggles module
-- ~~RightClick - opens settings menu~~ Currently being worked on :)
+- LeftClick - toggle module
+- RightClick - open settings menu
+#### Module Settings
+- RControl - close settings menu
