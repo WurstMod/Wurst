@@ -71,7 +71,7 @@ local function findPlr(str, multiple)
 end
 
 local settings = {
-	useWeb = false
+	useWeb = true
 }
 
 local config = {}
