@@ -1,10 +1,18 @@
 # Changelog
 
-## v1.2.0 [Unreleased]
+## v1.3.0 [Unreleased]
+### Added
+- Module keybinds
+
+## v1.2.0 [21/06/2021]
 ### Added
 - New modules
-### Maybe
-- Saving toggled modules & module settings to cloud
+- New settings option - checkbox
+### Fixed
+- Freecam no longer toggles all GUI on
+
+## v1.1.1 [20/06/2021]
+- **JUST A BUGFIX, I FORGOT TO ADD SOMETHING**
 
 ## v1.1.0 [20/06/2021]
 ### Added
