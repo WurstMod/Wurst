@@ -70,20 +70,19 @@ local function findPlr(str, multiple)
 	return false
 end
 
-local settings = {
-	useWeb = true
-}
-
 local config = {}
-config.version = "v1.0.0"
+config.version = "v1.2.0"
 config.github = {}
 config.github.name = "WurstMod/Wurst/"
 config.github.branch = "main"
 config.gui = {}
 config.gui.name = "wurst"
 config.gui.z = 1000
-if settings.useWeb then config.latestVersion = game:HttpGet("https://raw.githubusercontent.com/" .. config.github.name .. config.github.branch .. "/version")
-else config.latestVersion = config.version end
+if game.JobId ~= "00000000-0000-0000-0000-000000000000" then config.latestVersion = game:HttpGet("https://raw.githubusercontent.com/" .. config.github.name .. config.github.branch .. "/version")
+else config.latestVersion = game.ReplicatedStorage.reqWeb:InvokeServer("https://raw.githubusercontent.com/" .. config.github.name .. config.github.branch .. "/version") end
+-- used only for development
+
+config.latestVersion = config.latestVersion:gsub(string.format("\n"), "")
 
 local events = {}
 local stsEvents = {}
@@ -312,6 +311,55 @@ modSettings_textValue.TextColor3 = Color3.new(1, 1, 1)
 modSettings_textValue.TextScaled = true
 modSettings_textValue.ZIndex = modSettings.ZIndex + 1
 
+local modSettings_checkbox = Instance.new("Frame")
+modSettings_checkbox.Name = "text"
+modSettings_checkbox.BackgroundTransparency = 1
+modSettings_checkbox.Size = UDim2.new(1, 0, 0.05, 0)
+modSettings_checkbox.ZIndex = modSettings.ZIndex + 1
+
+local modSettings_checkboxTitle = Instance.new("TextLabel", modSettings_checkbox)
+modSettings_checkboxTitle.Name = "title"
+modSettings_checkboxTitle.BackgroundTransparency = 1
+modSettings_checkboxTitle.Size = UDim2.new(1, 0, 1, 0)
+modSettings_checkboxTitle.Font = Enum.Font.Nunito
+modSettings_checkboxTitle.TextXAlignment = Enum.TextXAlignment.Left
+modSettings_checkboxTitle.TextColor3 = Color3.new(1, 1, 1)
+modSettings_checkboxTitle.TextScaled = true
+modSettings_checkboxTitle.Text = "Title"
+modSettings_checkboxTitle.ZIndex = modSettings.ZIndex + 1
+
+local modSettings_checkboxValueOff = Instance.new("ImageLabel", modSettings_checkbox)
+modSettings_checkboxValueOff.Name = "valueOff"
+modSettings_checkboxValueOff.BackgroundTransparency = 1
+modSettings_checkboxValueOff.AnchorPoint = Vector2.new(1, 0)
+modSettings_checkboxValueOff.Size = UDim2.new(1, 0, 1, 0)
+modSettings_checkboxValueOff.SizeConstraint = Enum.SizeConstraint.RelativeYY
+modSettings_checkboxValueOff.Position = UDim2.new(1, 0, 0, 0)
+modSettings_checkboxValueOff.Image = "rbxassetid://6978759624"
+modSettings_checkboxValueOff.ZIndex = modSettings.ZIndex + 1
+
+local modSettings_checkboxValueOn = Instance.new("ImageLabel", modSettings_checkbox)
+modSettings_checkboxValueOn.Name = "valueOn"
+modSettings_checkboxValueOn.BackgroundTransparency = 1
+modSettings_checkboxValueOn.AnchorPoint = Vector2.new(1, 0)
+modSettings_checkboxValueOn.Size = UDim2.new(1, 0, 1, 0)
+modSettings_checkboxValueOn.SizeConstraint = Enum.SizeConstraint.RelativeYY
+modSettings_checkboxValueOn.Position = UDim2.new(1, 0, 0, 0)
+modSettings_checkboxValueOn.Image = "rbxassetid://6978759452"
+modSettings_checkboxValueOn.Visible = false
+modSettings_checkboxValueOn.ZIndex = modSettings.ZIndex + 1
+
+local modSettings_checkboxValueHitbox = Instance.new("ImageButton", modSettings_checkbox)
+modSettings_checkboxValueHitbox.Name = "hitbox"
+modSettings_checkboxValueHitbox.BackgroundTransparency = 1
+modSettings_checkboxValueHitbox.AnchorPoint = Vector2.new(1, 0)
+modSettings_checkboxValueHitbox.Size = UDim2.new(1, 0, 1, 0)
+modSettings_checkboxValueHitbox.SizeConstraint = Enum.SizeConstraint.RelativeYY
+modSettings_checkboxValueHitbox.Position = UDim2.new(1, 0, 0, 0)
+modSettings_checkboxValueHitbox.Image = ""
+modSettings_checkboxValueHitbox.HoverImage = ""
+modSettings_checkboxValueHitbox.ZIndex = modSettings.ZIndex + 2
+
 local isSettings = false
 local function buildSettings(mod, obj)
 	isSettings = true
@@ -367,6 +415,28 @@ local function buildSettings(mod, obj)
 				set(text.value.Text)
 			end)
 			table.insert(stsEvents, ev)
+		elseif v.type == "checkbox" then
+			local check = modSettings_checkbox:Clone()
+			check.LayoutOrder = i
+			check.Name = k
+			check.title.Text = v.title
+			check.valueOff.Visible = not v.value
+			check.valueOn.Visible = v.value
+			check.Parent = setts
+
+			local function set(n)
+				v.value = n
+				obj[k] = v
+				mod.settings = obj
+			end
+
+			local ev = check.hitbox.Activated:Connect(function()
+				v.value = not v.value
+				check.valueOff.Visible = not v.value
+				check.valueOn.Visible = v.value
+				set(v.value)
+			end)
+			table.insert(stsEvents, ev)
 		end
 		i += 1
 	end
@@ -414,8 +484,9 @@ local mods = {
 		},
 		onEnable = function(mod)
 			for _, g in pairs(plr.PlayerGui:GetChildren()) do
-				if g.Name == gui.Name then continue
+				if g.Name == gui.Name or not g:IsA("ScreenGui") then continue
 				else
+					log(g.Name .. " :)) " .. tostring(g.Enabled))
 					mod.data.freecamGUIs[g] = g.Enabled
 					g.Enabled = false
 				end
@@ -444,8 +515,8 @@ local mods = {
 			freecamCamCF = workspace.CurrentCamera.CFrame
 		end,
 		onDisable = function(mod)
-			for _, g in pairs(plr.PlayerGui:GetChildren()) do
-				g.Enabled = g
+			for g, v in pairs(mod.data.freecamGUIs) do
+				g.Enabled = v
 			end
 			for k, g in pairs(mod.data.freecamCores) do
 				game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType[k], g)
@@ -603,8 +674,8 @@ local mods = {
 			}
 		}),
 		onEnable = function(mod)
-			local plr = findPlr(mod.settings.plr.value, false)
-			if not plr then
+			local splr = findPlr(mod.settings.plr.value, false)
+			if not splr then
 				modDid[mod.id] = false
 				modTogEv[mod.id]:Fire()
 				return
@@ -640,7 +711,7 @@ local mods = {
 				title = "Fly Speed",
 				value = 60,
 				min = 1,
-				max = 200
+				max = 1000
 			}
 		}),
 		data = {
@@ -664,7 +735,7 @@ local mods = {
 				return Enum.ContextActionResult.Sink
 			end
 			
-			Context:BindActionAtPriority("FreecamKeyboard", flyKeyb, false, Enum.ContextActionPriority.High.Value, 
+			Context:BindActionAtPriority("FlyKeyboard", flyKeyb, false, Enum.ContextActionPriority.High.Value, 
 				Enum.KeyCode.W, Enum.KeyCode.Up,
 				Enum.KeyCode.A, Enum.KeyCode.Down,
 				Enum.KeyCode.S, Enum.KeyCode.Space,
@@ -684,7 +755,7 @@ local mods = {
 			plr.Character.Humanoid.PlatformStand = mod.isPlatform
 			plr.Character.Humanoid.AutoRotate = mod.autoRot
 			
-			Context:UnbindAction("FreecamKeyboard")
+			Context:UnbindAction("FlyKeyboard")
 			mod.data.flyKeyboard = {
 				W = 0,
 				A = 0,
@@ -720,6 +791,81 @@ local mods = {
 			mod.flyVel.Velocity = vel.p
 			plr.Character.PrimaryPart.CFrame = CFrame.new(plr.Character.PrimaryPart.Position, cf:ToWorldSpace(CFrame.new(0, 0, -999999)).p)
 		end,
+	},
+	{
+		name = "Sit",
+		id = "sit",
+		description = "Makes you sit.",
+		deathDisable = true,
+		settings = createOptions(),
+		onEnable = function(mod)
+			if not charCheck(plr.Character) then return end
+			
+			mod.isSit = plr.Character.Humanoid.Sit 
+		end,
+		onDisable = function(mod)
+			plr.Character.Humanoid.Sit = mod.isSit 	
+		end,
+		tick = function()
+			if not charCheck(plr.Character) then return end
+			
+			plr.Character.Humanoid.Sit = true
+		end,
+	},
+	{
+		name = "Spectate",
+		id = "spct",
+		description = "Makes you spectate another player.",
+		deathDisable = true,
+		settings = createOptions({
+			plr = {
+				type = "string",
+				title = "Player",
+				value = "Roblox"
+			}
+		}),
+		onEnable = function(mod)
+			mod.defType = workspace.CurrentCamera.CameraType
+			mod.defSubj = workspace.CurrentCamera.CameraSubject
+			
+			local splr = findPlr(mod.settings.plr.value, false)
+			if not splr then
+				modDid[mod.id] = false
+				modTogEv[mod.id]:Fire()
+				return
+			end
+		end,
+		onDisable = function(mod)
+			workspace.CurrentCamera.CameraType = mod.defType 
+			workspace.CurrentCamera.CameraSubject = mod.defSubj 
+		end,
+		tick = function(mod)
+			if not charCheck(plr.Character) then return end
+			local splr = findPlr(mod.settings.plr.value)
+			if not splr or not charCheck(splr.Character) then return end
+			
+			workspace.CurrentCamera.CameraSubject = splr.Character.Humanoid
+		end,
+	},
+	{
+		name = "Fling",
+		id = "flng",
+		description = "Makes your character spin, flinging everyone.",
+		deathDisable = true,
+		autoEnable = {"nclp"},
+		settings = createOptions(),
+		onEnable = function(mod)
+			if not charCheck(plr.Character) then return end
+			local power = 100000
+			mod.flingVel = Instance.new("BodyAngularVelocity")
+			mod.flingVel.AngularVelocity = Vector3.new(0, power, 0)
+			mod.flingVel.MaxTorque = Vector3.new(0, power, 0)
+			mod.flingVel.Parent = plr.Character.HumanoidRootPart
+		end,
+		onDisable = function(mod)
+			mod.flingVel:Destroy()
+			mod.flingVel = nil
+		end,
 	}
 }
 
@@ -740,8 +886,27 @@ ev = game:GetService("RunService").Heartbeat:Connect(function()
 				local het = 0.03
 				local lines = modObj.extraLines or 1
 				description.Size = UDim2.new(1, 0, het * lines, 0)
+				description.AnchorPoint = Vector2.new(0, 1)
 			end 
 		end
+	end
+	
+	if (mouse.X >= titleText.AbsolutePosition.X and mouse.X < titleText.AbsolutePosition.X + titleText.AbsoluteSize.X) and (mouse.Y >= titleText.AbsolutePosition.Y and mouse.y < titleText.AbsolutePosition.Y + titleText.AbsoluteSize.Y) then
+		local lines = 1
+		local txt = ""
+		if config.version == config.latestVersion then
+			txt = string.format("You are on the latest version (%s)!", config.latestVersion)
+		else
+			txt = string.format("Outdated!\nYou are on version %s while the\nlatest version is %s!", config.version, config.latestVersion)
+			lines = 3
+		end
+		
+		local het = 0.03
+		description.Size = UDim2.new(1, 0, het * lines, 0)
+		description.AnchorPoint = Vector2.new()
+		description.Text = txt
+		
+		isHover = true
 	end
 	
 	if isHover then
@@ -774,6 +939,7 @@ end)
 table.insert(events, ev)
 
 for imod, mod in pairs(mods) do
+	mod.settings = mod.settings or createOptions()
 	modToggle[mod.id] = false
 	modEvs[mod.id] = {}
 	modTogEv[mod.id] = Instance.new("BindableEvent")
@@ -794,6 +960,9 @@ for imod, mod in pairs(mods) do
 			}):Play()
 
 			spawn(function()
+				if mod.autoEnable then for _, m in pairs(mods) do
+					if not modToggle[m.id] and table.find(mod.autoEnable, m.id) then modTogEv[m.id]:Fire() end
+				end end
 				mod:onEnable(mod)
 				modDid[mod.id] = true
 			end)
