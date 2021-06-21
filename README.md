@@ -65,14 +65,3 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/main/s
   
   You can also use an on-screen keyboard, which allows you to press keys just by clicking on them.
 </details>
-
-<details>
-  <summary>Modify our script (kinda)</summary>
-  
-  You can also modify our script, to change the keybind.
-  ```lua
-  local script = game:HttpGet("YOUR_PREFFERED_URL")
-  script = script:gsub("RightShift", "LeftShift")
-  loadstring(script)
-  ```
-</details>
