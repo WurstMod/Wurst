@@ -3,6 +3,10 @@
 ## v1.3.0 [Unreleased]
 ### Added
 - Module keybinds
+- New modules:
+  * Aimbot
+  * Killaura
+  * PlayerESP
 
 ## v1.2.0 [21/06/2021]
 ### Added
