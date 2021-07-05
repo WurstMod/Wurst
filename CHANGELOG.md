@@ -1,10 +1,10 @@
 # Changelog
 
-## v1.3.0 [Unreleased]
+## v1.3.0 [05/07/2021]
 ### Added
 - Module keybinds!!!!!!
 - New modules:
-  * Killaura
+  * KillAura
   * ClickToTP
 
 ## v1.2.0 [21/06/2021]
