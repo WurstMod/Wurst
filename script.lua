@@ -8,8 +8,19 @@ local UIS = game:GetService("UserInputService")
 local Context = game:GetService("ContextActionService")
 local tweens = game:GetService("TweenService")
 
+local keycodes = {["Unknown"]=0,["Backspace"]=8,["Tab"]=9,["Clear"]=12,["Return"]=13,["Pause"]=19,["Escape"]=27,["Space"]=32,["QuotedDouble"]=34,["Hash"]=35,["Dollar"]=36,["Percent"]=37,["Ampersand"]=38,["Quote"]=39,["LeftParenthesis"]=40,["RightParenthesis"]=41,["Asterisk"]=42,["Plus"]=43,["Comma"]=44,["Minus"]=45,["Period"]=46,["Slash"]=47,["Zero"]=48,["One"]=49,["Two"]=50,["Three"]=51,["Four"]=52,["Five"]=53,["Six"]=54,["Seven"]=55,["Eight"]=56,["Nine"]=57,["Colon"]=58,["Semicolon"]=59,["LessThan"]=60,["Equals"]=61,["GreaterThan"]=62,["Question"]=63,["At"]=64,["LeftBracket"]=91,["BackSlash"]=92,["RightBracket"]=93,["Caret"]=94,["Underscore"]=95,["Backquote"]=96,["A"]=97,["B"]=98,["C"]=99,["D"]=100,["E"]=101,["F"]=102,["G"]=103,["H"]=104,["I"]=105,["J"]=106,["K"]=107,["L"]=108,["M"]=109,["N"]=110,["O"]=111,["P"]=112,["Q"]=113,["R"]=114,["S"]=115,["T"]=116,["U"]=117,["V"]=118,["W"]=119,["X"]=120,["Y"]=121,["Z"]=122,["LeftCurly"]=123,["Pipe"]=124,["RightCurly"]=125,["Tilde"]=126,["Delete"]=127,["KeypadZero"]=256,["KeypadOne"]=257,["KeypadTwo"]=258,["KeypadThree"]=259,["KeypadFour"]=260,["KeypadFive"]=261,["KeypadSix"]=262,["KeypadSeven"]=263,["KeypadEight"]=264,["KeypadNine"]=265,["KeypadPeriod"]=266,["KeypadDivide"]=267,["KeypadMultiply"]=268,["KeypadMinus"]=269,["KeypadPlus"]=270,["KeypadEnter"]=271,["KeypadEquals"]=272,["Up"]=273,["Down"]=274,["Right"]=275,["Left"]=276,["Insert"]=277,["Home"]=278,["End"]=279,["PageUp"]=280,["PageDown"]=281,["LeftShift"]=304,["RightShift"]=303,["LeftMeta"]=310,["RightMeta"]=309,["LeftAlt"]=308,["RightAlt"]=307,["LeftControl"]=306,["RightControl"]=305,["CapsLock"]=301,["NumLock"]=300,["ScrollLock"]=302,["LeftSuper"]=311,["RightSuper"]=312,["Mode"]=313,["Compose"]=314,["Help"]=315,["Print"]=316,["SysReq"]=317,["Break"]=318,["Menu"]=319,["Power"]=320,["Euro"]=321,["Undo"]=322,["F1"]=282,["F2"]=283,["F3"]=284,["F4"]=285,["F5"]=286,["F6"]=287,["F7"]=288,["F8"]=289,["F9"]=290,["F10"]=291,["F11"]=292,["F12"]=293,["F13"]=294,["F14"]=295,["F15"]=296,["World0"]=160,["World1"]=161,["World2"]=162,["World3"]=163,["World4"]=164,["World5"]=165,["World6"]=166,["World7"]=167,["World8"]=168,["World9"]=169,["World10"]=170,["World11"]=171,["World12"]=172,["World13"]=173,["World14"]=174,["World15"]=175,["World16"]=176,["World17"]=177,["World18"]=178,["World19"]=179,["World20"]=180,["World21"]=181,["World22"]=182,["World23"]=183,["World24"]=184,["World25"]=185,["World26"]=186,["World27"]=187,["World28"]=188,["World29"]=189,["World30"]=190,["World31"]=191,["World32"]=192,["World33"]=193,["World34"]=194,["World35"]=195,["World36"]=196,["World37"]=197,["World38"]=198,["World39"]=199,["World40"]=200,["World41"]=201,["World42"]=202,["World43"]=203,["World44"]=204,["World45"]=205,["World46"]=206,["World47"]=207,["World48"]=208,["World49"]=209,["World50"]=210,["World51"]=211,["World52"]=212,["World53"]=213,["World54"]=214,["World55"]=215,["World56"]=216,["World57"]=217,["World58"]=218,["World59"]=219,["World60"]=220,["World61"]=221,["World62"]=222,["World63"]=223,["World64"]=224,["World65"]=225,["World66"]=226,["World67"]=227,["World68"]=228,["World69"]=229,["World70"]=230,["World71"]=231,["World72"]=232,["World73"]=233,["World74"]=234,["World75"]=235,["World76"]=236,["World77"]=237,["World78"]=238,["World79"]=239,["World80"]=240,["World81"]=241,["World82"]=242,["World83"]=243,["World84"]=244,["World85"]=245,["World86"]=246,["World87"]=247,["World88"]=248,["World89"]=249,["World90"]=250,["World91"]=251,["World92"]=252,["World93"]=253,["World94"]=254,["World95"]=255,["ButtonX"]=1000,["ButtonY"]=1001,["ButtonA"]=1002,["ButtonB"]=1003,["ButtonR1"]=1004,["ButtonL1"]=1005,["ButtonR2"]=1006,["ButtonL2"]=1007,["ButtonR3"]=1008,["ButtonL3"]=1009,["ButtonStart"]=1010,["ButtonSelect"]=1011,["DPadLeft"]=1012,["DPadRight"]=1013,["DPadUp"]=1014,["DPadDown"]=1015,["Thumbstick1"]=1016,["Thumbstick2"]=1017}
+
 local function log(msg)
 	print("[WurstMod] " .. tostring(msg))
+end
+local function getKeyName(keyc)
+	
+	local inverted = {}
+	for x, d in pairs(keycodes) do
+		inverted[d] = x
+	end
+	
+	return inverted[tonumber(keyc)] or "[UNKNOWN]"
 end
 local function charCheck(char)
 	return (not not char) and not not (char and char:FindFirstChild("Humanoid")) and (char and char:FindFirstChild("Humanoid") and char.Humanoid.Health > 0)
@@ -19,7 +30,7 @@ local function createOptions(obj)
 		keybind = {
 			type = "key",
 			title = "Keybind",
-			value = -1
+			value = 0
 		}
 	}
 
@@ -71,7 +82,7 @@ local function findPlr(str, multiple)
 end
 
 local config = {}
-config.version = "v1.2.0"
+config.version = "v1.3.0"
 config.github = {}
 config.github.name = "WurstMod/Wurst/"
 config.github.branch = "main"
@@ -80,7 +91,7 @@ config.gui.name = "wurst"
 config.gui.z = 1000
 if game.JobId ~= "00000000-0000-0000-0000-000000000000" then config.latestVersion = game:HttpGet("https://raw.githubusercontent.com/" .. config.github.name .. config.github.branch .. "/version")
 else config.latestVersion = game.ReplicatedStorage.reqWeb:InvokeServer("https://raw.githubusercontent.com/" .. config.github.name .. config.github.branch .. "/version") end
--- used only for development
+-- used only for development :)
 
 config.latestVersion = config.latestVersion:gsub(string.format("\n"), "")
 
@@ -110,6 +121,13 @@ title.Name = "title"
 title.BackgroundTransparency = 1
 title.Size = UDim2.new(0.43, 0, 0.125, 0)
 title.ZIndex = config.gui.z + #gui:GetDescendants()
+
+local modal = Instance.new("TextButton", gui)
+modal.Visible = true
+modal.Modal = false
+modal.BackgroundTransparency = 1
+modal.Size = UDim2.new(0, 0, 0, 0)
+modal.Position = UDim2.new(-5, 0, -5, 0)
 
 local titleText = Instance.new("TextLabel", title)
 titleText.Name = "text"
@@ -278,6 +296,38 @@ modSettings_numberValue.TextColor3 = Color3.new(1, 1, 1)
 modSettings_numberValue.TextScaled = true
 modSettings_numberValue.ZIndex = modSettings.ZIndex + 1
 
+local modSettings_key = Instance.new("Frame")
+modSettings_key.Name = "text"
+modSettings_key.BackgroundTransparency = 1
+modSettings_key.Size = UDim2.new(1, 0, 0.05, 0)
+modSettings_key.ZIndex = modSettings.ZIndex + 1
+
+local modSettings_keyTitle = Instance.new("TextLabel", modSettings_key)
+modSettings_keyTitle.Name = "title"
+modSettings_keyTitle.BackgroundTransparency = 1
+modSettings_keyTitle.Size = UDim2.new(1, 0, 1, 0)
+modSettings_keyTitle.Font = Enum.Font.Nunito
+modSettings_keyTitle.TextXAlignment = Enum.TextXAlignment.Left
+modSettings_keyTitle.TextColor3 = Color3.new(1, 1, 1)
+modSettings_keyTitle.TextScaled = true
+modSettings_keyTitle.Text = "Title"
+modSettings_keyTitle.ZIndex = modSettings.ZIndex + 1
+
+local modSettings_keyValue = Instance.new("TextButton", modSettings_key)
+modSettings_keyValue.Name = "value"
+modSettings_keyValue.AnchorPoint = Vector2.new(1, 0)
+modSettings_keyValue.BackgroundColor3 = Color3.fromHSV(0, 0, 0.235294)
+modSettings_keyValue.AutoButtonColor = false
+modSettings_keyValue.BackgroundTransparency = 0.5
+modSettings_keyValue.BorderSizePixel = 0
+modSettings_keyValue.Size = UDim2.new(5, 0, 1, 0)
+modSettings_keyValue.Position = UDim2.new(1, 0, 0, 0)
+modSettings_keyValue.SizeConstraint = Enum.SizeConstraint.RelativeYY
+modSettings_keyValue.Font = Enum.Font.Nunito
+modSettings_keyValue.TextColor3 = Color3.new(1, 1, 1)
+modSettings_keyValue.TextScaled = true
+modSettings_keyValue.ZIndex = modSettings.ZIndex + 1
+
 local modSettings_text = Instance.new("Frame")
 modSettings_text.Name = "text"
 modSettings_text.BackgroundTransparency = 1
@@ -361,6 +411,7 @@ modSettings_checkboxValueHitbox.HoverImage = ""
 modSettings_checkboxValueHitbox.ZIndex = modSettings.ZIndex + 2
 
 local isSettings = false
+local mods = {}
 local function buildSettings(mod, obj)
 	isSettings = true
 	local setts = modSettings:Clone()
@@ -371,7 +422,71 @@ local function buildSettings(mod, obj)
 	
 	local i = 1
 	for k, v in pairs(obj) do
-		if v.type == "number" then
+		if v.type == "key" then
+			local function getKeybinds()
+				local keybinds = {}
+
+				for _, md in pairs(mods) do
+					if md == mod then continue end
+					for _, sts in pairs(md.settings) do
+						if sts.type == "key" and sts.value ~= 0 then table.insert(keybinds, sts.value) end
+					end
+				end
+
+				return keybinds
+			end
+			local function getColor(kbs, vl)
+				if table.find(kbs, vl) then return Color3.new(1, 0, 0)
+				else return Color3.new(1, 1, 1) end
+			end
+
+			local key = modSettings_key:Clone()
+			key.LayoutOrder = i
+			key.Name = k
+			key.title.Text = v.title
+			key.value.Text = getKeyName(v.value)
+			key.value.TextColor3 = getColor(getKeybinds(), v.value)
+			key.Parent = setts
+
+			local ev, evv
+			local tooched = false
+			ev = key.value.Activated:Connect(function()
+				tooched = not tooched
+
+				if tooched then
+					mod.isChangingKeybind = true
+					key.value.BackgroundColor3 = Color3.fromHSV(0.333333, 1, 0.470588)
+					key.value.Text = "Waiting for Input..."
+					key.value.TextColor3 = Color3.fromRGB(216, 216, 216)
+
+					evv = UIS.InputBegan:Connect(function(kb, ch)
+						if ch then return end
+						if kb.UserInputType ~= Enum.UserInputType.Keyboard then return end
+
+						if evv then evv:Disconnect() end
+						local kebs = getKeybinds()
+						
+						v.value = kb.KeyCode.Value
+						key.value.TextColor3 = Color3.new(1, 1, 1)
+						key.value.Text = getKeyName(v.value)
+						key.value.TextColor3 = getColor(kebs, v.value)
+						key.value.BackgroundColor3 = Color3.fromHSV(0, 0, 0.235294)
+						tooched = not tooched
+						wait(.2)
+						if not tooched then mod.isChangingKeybind = false end
+					end)
+					table.insert(stsEvents, evv)
+				else
+					mod.isChangingKeybind = false
+					if evv then evv:Disconnect() end
+					key.value.TextColor3 = Color3.new(1, 1, 1)
+					key.value.Text = getKeyName(v.value)
+					key.value.TextColor3 = getColor(getKeybinds(), v.value)
+					key.value.BackgroundColor3 = Color3.fromHSV(0, 0, 0.235294)
+				end
+			end)
+			table.insert(stsEvents, ev)
+		elseif v.type == "number" then
 			local numb = modSettings_number:Clone()
 			numb.LayoutOrder = i
 			numb.Name = k
@@ -457,7 +572,7 @@ local modToggle = {}
 local modEvs = {}
 local modDid = {}
 local modTogEv = {}
-local mods = {
+mods = {
 	{
 		name = "Freecam",
 		id = "fcm",
@@ -486,7 +601,6 @@ local mods = {
 			for _, g in pairs(plr.PlayerGui:GetChildren()) do
 				if g.Name == gui.Name or not g:IsA("ScreenGui") then continue
 				else
-					log(g.Name .. " :)) " .. tostring(g.Enabled))
 					mod.data.freecamGUIs[g] = g.Enabled
 					g.Enabled = false
 				end
@@ -866,6 +980,160 @@ local mods = {
 			mod.flingVel:Destroy()
 			mod.flingVel = nil
 		end,
+	},
+	{
+		name = "KillAura",
+		id = "klaura",
+		description = "Makes your character look at anyone near the radius.",
+		deathDisable = true,
+		settings = createOptions({
+			walls = {
+				type = "checkbox",
+				title = "Check Walls",
+				value = false
+			},
+			looking = {
+				type = "checkbox",
+				title = "Check Looking",
+				value = false
+			},
+			camr = {
+				type = "checkbox",
+				title = "Restore Camera Rotation when Target is Lost",
+				value = true
+			},
+			radius = {
+				type = "number",
+				title = "Radius (in studs)",
+				value = 10,
+				min = 25,
+				max = 5000
+			}
+		}),
+		onEnable = function() end,
+		tick = function(mod)
+			local targets = {}
+			for _, pl in pairs(game.Players:GetChildren()) do
+				if pl.UserId == plr.UserId then continue end
+				if pl.Character and pl.Character.PrimaryPart then
+					local prm = pl.Character.PrimaryPart
+					local magnc = (prm.Position - plr.Character.PrimaryPart.Position).Magnitude
+					
+					if magnc > mod.settings.radius.value then continue end
+					
+					local cpos, isCm = workspace.CurrentCamera:WorldToScreenPoint(prm.Position)
+					if not isCm and mod.settings.looking.value then continue end
+					
+					if mod.settings.walls.value then
+						local rDir = workspace.CurrentCamera.CFrame.p - plr.Character.PrimaryPart.Position
+						local raycastParams = RaycastParams.new()
+						raycastParams.FilterDescendantsInstances = plr.Character:GetChildren()
+						raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+						local ray = workspace:Raycast(workspace.CurrentCamera.CFrame.p, rDir, raycastParams)
+						
+						if ray then
+							local prt = ray.Instance
+							if prt then
+								if not table.find(pl.Character:GetDescendants(), prt) then continue end
+							else continue end
+						else continue end
+					end					
+					
+					table.insert(targets, pl)
+				end
+			end
+			
+			local target
+			if #targets == 1 then target = targets[1]
+			elseif #targets > 1 then
+				table.sort(targets, function(a, b)
+					local function getMgn(pl)
+						local prm = pl.Character.PrimaryPart
+						local magnc = (prm.Position - plr.Character.PrimaryPart.Position).Magnitude
+						return magnc
+					end
+					
+					local aMgn = getMgn(a)
+					local bMgn = getMgn(b)
+					
+					return bMgn > aMgn
+				end)
+				target = targets[1]
+			end
+			
+			if target then
+				if not mod.lastRot then
+					local x, y, z = workspace.CurrentCamera.CFrame:ToEulerAnglesXYZ()
+					mod.lastRot = {x, y, z}
+				end
+				
+				local prmpr = target.Character.PrimaryPart
+				local ps = plr.Character.PrimaryPart
+				local magnit = (ps.Position - prmpr.Position).Magnitude
+				
+				local pos = target.Character.Head.Position + prmpr.Velocity * (magnit / 1000)
+				local cf = CFrame.new(workspace.CurrentCamera.CFrame.p, pos)
+				
+				workspace.CurrentCamera.CFrame = cf
+			elseif mod.settings.camr and mod.lastRot then
+				local cf = CFrame.new(workspace.CurrentCamera.CFrame.p) * CFrame.Angles(mod.lastRot[1], mod.lastRot[2], mod.lastRot[3]) 
+
+				workspace.CurrentCamera.CFrame = cf
+				mod.lastRot = nil
+			end
+			
+		end,
+		onDisable = function() end,
+	},
+	{
+		name = "ClickToTP",
+		id = "cttp",
+		description = "Teleports you to your mouse's position.",
+		settings = createOptions({
+			tpkey = {
+				type = "key",
+				title = "Teleport key",
+				value = 268
+			}
+		}),
+		deathDisable = true,
+		onEnable = function(mod)
+			local part = Instance.new("Part")
+			part.Shape = Enum.PartType.Ball
+			part.Material = Enum.Material.ForceField
+			part.Name = "tpdisc"
+			part.Size = Vector3.new(1.5, 1.5, 1.5)
+			part.CanCollide = false
+			part.Anchored = true
+			part.Parent = workspace
+			
+			mod.filter = mouse.TargetFilter
+			mouse.TargetFilter = part
+			
+			local mesh = Instance.new("SpecialMesh", part)
+			mesh.Scale = part.Size
+			mesh.MeshType = Enum.MeshType.Sphere
+			mod.disc = part
+
+			mod.clickListen = UIS.InputBegan:Connect(function(k)
+				if not mod.isChangingKeybind and mod.settings.tpkey.value == tonumber(k.KeyCode.Value) then
+					if modulesList.Visible or isSettings then return end
+					plr.Character.PrimaryPart.CFrame = CFrame.new(mod.disc.Position + Vector3.new(0, plr.Character.PrimaryPart.Size.Y, 0))
+				end
+			end)
+		end,
+		tick = function(mod)
+			if mod.disc then
+				mod.disc.Position = mouse.Hit.p
+			end
+		end,
+		onDisable = function(mod)
+			if mod.clickListen then mod.clickListen:Disconnect() end
+			if mod.clickListen2 then mod.clickListen2:Disconnect() end
+			mod.disc:Destroy()
+			mod.disc = nil
+			mouse.TargetFilter = mod.filter
+		end,
 	}
 }
 
@@ -930,9 +1198,13 @@ table.insert(events, ev)
 
 -- runs modules' tick funcs etc.
 ev = game:GetService("RunService").Stepped:Connect(function()
+	modal.Modal = isSettings or modulesList.Visible
+	
 	for _, mod in pairs(mods) do
 		if modToggle[mod.id] and modDid[mod.id] then
-			if mod.tick then mod:tick(mod) end
+			if mod.tick then
+				pcall(mod.tick, mod, mod)
+			end
 		end
 	end
 end)
@@ -951,7 +1223,7 @@ for imod, mod in pairs(mods) do
 	
 	local togg
 	togg = function(isDeath)
-		if isDeath and not charCheck(plr.Character) then return end
+		if not isDeath and not charCheck(plr.Character) then return end
 		modToggle[mod.id] = not modToggle[mod.id]
 		modDid[mod.id] = false
 		if modToggle[mod.id] then
@@ -963,13 +1235,13 @@ for imod, mod in pairs(mods) do
 				if mod.autoEnable then for _, m in pairs(mods) do
 					if not modToggle[m.id] and table.find(mod.autoEnable, m.id) then modTogEv[m.id]:Fire() end
 				end end
-				mod:onEnable(mod)
+				pcall(mod.onEnable, mod, mod)
 				modDid[mod.id] = true
 			end)
 			
 			if mod.deathDisable then table.insert(modEvs[mod.id], plr.Character.Humanoid.Died:Connect(function()
 				togg(true)
-				end)) end
+			end)) end
 			
 			for _, mdl in pairs(modlist:GetChildren()) do
 				if mdl.Name == mod.id then
@@ -993,7 +1265,7 @@ for imod, mod in pairs(mods) do
 			}):Play()
 
 			spawn(function()
-				mod:onDisable(mod)
+				pcall(mod.onDisable, mod, mod)
 				modDid[mod.id] = true
 			end)
 			
@@ -1012,6 +1284,16 @@ for imod, mod in pairs(mods) do
 			end
 		end
 	end
+	
+	ev = UIS.InputBegan:Connect(function(kb, ch)
+		if ch then return end
+		
+		if mod.isChangingKeybind then return end
+		if tonumber(kb.KeyCode.Value) == tonumber(mod.settings.keybind.value) and kb.UserInputType == Enum.UserInputType.Keyboard then
+			togg()
+		end
+	end)
+	table.insert(events, ev)
 	
 	modul.btn.Activated:Connect(togg)
 	modTogEv[mod.id].Event:Connect(togg)
