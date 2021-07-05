@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.4.0 [UNRELEASED]
+### Added
+- New modules:
+  * PlayerESP
+  * AutoClicker
+
+## v1.3.1 [05/07/2021]
+- Pressing an unknown key no longer toggles all modules on
+
 ## v1.3.0 [05/07/2021]
 ### Added
 - Module keybinds!!!!!!
