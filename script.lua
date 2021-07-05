@@ -82,7 +82,7 @@ local function findPlr(str, multiple)
 end
 
 local config = {}
-config.version = "v1.3.0"
+config.version = "v1.3.1"
 config.github = {}
 config.github.name = "WurstMod/Wurst/"
 config.github.branch = "main"
@@ -1289,6 +1289,7 @@ for imod, mod in pairs(mods) do
 		if ch then return end
 		
 		if mod.isChangingKeybind then return end
+		if kb.KeyCode == Enum.KeyCode.Unknown then return end
 		if tonumber(kb.KeyCode.Value) == tonumber(mod.settings.keybind.value) and kb.UserInputType == Enum.UserInputType.Keyboard then
 			togg()
 		end
