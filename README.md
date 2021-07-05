@@ -16,6 +16,14 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/main/s
 ```
 ## Different Versions
 <details>
+  <summary>v1.3.1 - Bugfix</summary>
+  
+  ```lua
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/1920c229962b8ac8223443a52fa96cfa97b73763/script.lua"))
+  ```
+</details>
+
+<details>
   <summary>v1.3.0</summary>
   
   ```lua
