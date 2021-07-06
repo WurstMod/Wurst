@@ -4,7 +4,8 @@
 ### Added
 - New modules:
   * PlayerESP
-  * AutoClicker
+  * PlaySound
+  * Animations
 
 ## v1.3.1 [05/07/2021]
 - Pressing an unknown key no longer toggles all modules on
