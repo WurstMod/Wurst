@@ -1,7 +1,7 @@
 # You are **_not_** allowed to use our work without crediting us.
 
 <div align="center">
-    <img src="https://raw.githubusercontent.com/WurstMod/Wurst/main/wurst.png" />
+    <img src="https://raw.githubusercontent.com/WurstMod/Wurst/dev/wurst.png" />
 </div>
 
 ----
@@ -12,14 +12,14 @@ WurstMod is a **mod** for Roblox, inspired by Wurst for Minecraft™
 
 # Loading the Script
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/main/script.lua"))
+loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/dev/script.lua"))
 ```
 ## Different Versions
 <details>
   <summary>v1.3.2</summary>
   
   ```lua
-  loadstring(game:HttpGet("https://github.com/WurstMod/Wurst/blob/1bdf30d7b95b0ce6aa6c91b5420c44f65df21bc7/script.lua"))
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/blob/1bdf30d7b95b0ce6aa6c91b5420c44f65df21bc7/script.lua"))
   ```
 </details>
 
