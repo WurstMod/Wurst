@@ -1200,8 +1200,7 @@ mods = {
 			mod.disc = part
 
 			mod.clickListen = UIS.InputBegan:Connect(function(k)
-				if not mod.isChangingKeybind and mod.settings.tpkey.value == tonumber(k.KeyCode.Value) then
-					if modulesList.Visible or isSettings then return end
+				if not mod.isChangingKeybind and tonumber(mod.settings.tpkey.value) == tonumber(k.KeyCode.Value) then
 					plr.Character.PrimaryPart.CFrame = CFrame.new(mod.disc.Position + Vector3.new(0, plr.Character.PrimaryPart.Size.Y, 0))
 				end
 			end)
@@ -1272,29 +1271,32 @@ mods = {
 			gg.BackgroundTransparency = 1
 			gg.ZIndex = -1
 			
+			mod.camAtts = {}
+			
 			mod.gui = gg
 		end,
 		tick = function(mod)
 			local gg = mod.gui
 			
 			gg.CurrentCamera = workspace.CurrentCamera
-			if mod.rainbowHue >= 255 then mod.rainbowHue = 0 end
+			
+			if mod.rainbowHue >= 1 then mod.rainbowHue = 0 end
 			
 			local plrs = {}
 			for _, p in pairs(game.Players:GetChildren()) do
-				if p.UserId == plr.UserId then continue end
+				--if p.UserId == plr.UserId then continue end
 				if mod.settings.team.value and p.Team == plr.Team and plr.Team and p.Team then continue end
 				
 				if p.Character then table.insert(plrs, p) end
 			end
 			
 			for _, xdd in pairs(gg:GetChildren()) do
+				if not xdd:IsA("Model") then continue end
 				for _, xd in pairs(plrs) do
 					if xd.UserId == xdd.Name then
 						for _, xddd in pairs(xd.Character:GetChildren()) do
 							if xddd:IsA("BasePart") then mod.parts[xddd] = nil end
 						end
-						continue
 					end
 				end
 			end
@@ -1306,6 +1308,14 @@ mods = {
 				end
 				
 				local lel = gg:FindFirstChild(pl.UserId)
+				local espColor = Color3.new(1, 1, 1)
+				if mod.settings.color.value == 1 and pl.TeamColor then
+					espColor = pl.TeamColor.Color
+				elseif mod.settings.color.value == 10 then
+					espColor = Color3.fromHSV(mod.rainbowHue, 1, 1)
+				else
+					espColor = mod.colors[mod.settings.color.value]
+				end
 				
 				for _, xd in pairs(pl.Character:GetChildren()) do
 					if xd:IsA("BasePart") then
@@ -1313,13 +1323,7 @@ mods = {
 							local prt = mod.parts[xd]
 							prt.CFrame = xd.CFrame
 							prt.Size = xd.Size
-							if mod.settings.color.value == 1 then
-								local clr = Color3.new(1, 1, 1)
-								if pl.TeamColor then clr = pl.TeamColor.Color end 
-								prt.Color = clr
-							elseif mod.settings.color.value == 10 then
-								prt.Color = Color3.fromHSV(mod.rainbowHue / 255, 1, 1)
-							else prt.Color = mod.colors[mod.settings.color.value] end
+							prt.Color = espColor
 						else
 							local arch = xd.Archivable
 							xd.Archivable = true
@@ -1327,6 +1331,7 @@ mods = {
 							prt:ClearAllChildren()
 							xd.Archivable = arch
 							
+							if pl.Character.PrimaryPart == xd then lel.PrimaryPart = prt end
 							prt.Material = Enum.Material.SmoothPlastic
 							prt.Parent = lel
 							prt.Anchored = true
@@ -1337,11 +1342,43 @@ mods = {
 				end
 			end
 			
-			mod.rainbowHue += 0.5
+			mod.rainbowHue += 0.5 / 255
 		end,
 		onDisable = function(mod)
 			mod.gui:Destroy()
 			mod.parts = {}
+		end,
+	},
+	{
+		name = "PlaySound",
+		id = "plsnd",
+		description = "Plays a sound (only for you).",
+		settings = createOptions({
+			sound = {
+				type = "string",
+				title = "Sound ID",
+				value = "152745539"
+			},
+			loop = {
+				type = "checkbox",
+				title = "Looped",
+				value = false
+			}
+		}),
+		onEnable = function(mod)
+			local id = mod.settings.sound.value
+			local snd = Instance.new("Sound")
+			mod.snd = snd
+			snd.SoundId = "rbxassetid://" .. mod.settings.sound.value
+			repeat wait() until snd.IsLoaded
+			snd:Play()
+		end,
+		tick = function(mod)
+			mod.snd.Looped = mod.settings.loop.value
+		end,
+		onDisable = function(mod)
+			mod.snd:Destroy()
+			mod.snd = nil
 		end,
 	}
 }
@@ -1412,7 +1449,8 @@ ev = game:GetService("RunService").Stepped:Connect(function()
 	for _, mod in pairs(mods) do
 		if modToggle[mod.id] and modDid[mod.id] then
 			if mod.tick then
-				pcall(mod.tick, mod, mod)
+				local scs, xd = pcall(mod.tick, mod, mod)
+				if not scs then print(scs, xd) end
 			end
 		end
 	end
@@ -1444,7 +1482,9 @@ for imod, mod in pairs(mods) do
 				if mod.autoEnable then for _, m in pairs(mods) do
 					if not modToggle[m.id] and table.find(mod.autoEnable, m.id) then modTogEv[m.id]:Fire() end
 				end end
-				pcall(mod.onEnable, mod, mod)
+				local scs, xd = pcall(mod.onEnable, mod, mod)
+				if not scs then print(scs, xd) end
+				
 				modDid[mod.id] = true
 			end)
 			
