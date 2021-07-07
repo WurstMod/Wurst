@@ -82,10 +82,10 @@ local function findPlr(str, multiple)
 end
 
 local config = {}
-config.version = "v1.3.1"
+config.version = "v1.3.2"
 config.github = {}
 config.github.name = "WurstMod/Wurst/"
-config.github.branch = "main"
+config.github.branch = "dev"
 config.gui = {}
 config.gui.name = "wurst"
 config.gui.z = 1000
@@ -123,6 +123,7 @@ title.Size = UDim2.new(0.43, 0, 0.125, 0)
 title.ZIndex = config.gui.z + #gui:GetDescendants()
 
 local modal = Instance.new("TextButton", gui)
+modal.Name = "modal"
 modal.Visible = true
 modal.Modal = false
 modal.BackgroundTransparency = 1
@@ -239,7 +240,7 @@ modlistMod.TextColor3 = Color3.new()
 modlistMod.TextXAlignment = Enum.TextXAlignment.Left
 modlistMod.ZIndex = modlist.ZIndex + 1
 
-local modSettings = Instance.new("Frame")
+local modSettings = Instance.new("ScrollingFrame")
 modSettings.Name = "settings"
 modSettings.BackgroundTransparency = 0.6
 modSettings.BorderSizePixel = 0
@@ -247,6 +248,8 @@ modSettings.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 modSettings.Position = UDim2.new(0.5, 0, 0.5, 0)
 modSettings.AnchorPoint = Vector2.new(0.5, 0.5)
 modSettings.Size = UDim2.new(1, 0, 0.93, 0)
+modSettings.CanvasSize = UDim2.new()
+modSettings.ScrollBarThickness = 5
 modSettings.ZIndex = config.gui.z + #gui:GetDescendants()
 
 local modSettingsList = Instance.new("UIListLayout", modSettings)
@@ -297,7 +300,7 @@ modSettings_numberValue.TextScaled = true
 modSettings_numberValue.ZIndex = modSettings.ZIndex + 1
 
 local modSettings_key = Instance.new("Frame")
-modSettings_key.Name = "text"
+modSettings_key.Name = "key"
 modSettings_key.BackgroundTransparency = 1
 modSettings_key.Size = UDim2.new(1, 0, 0.05, 0)
 modSettings_key.ZIndex = modSettings.ZIndex + 1
@@ -362,7 +365,7 @@ modSettings_textValue.TextScaled = true
 modSettings_textValue.ZIndex = modSettings.ZIndex + 1
 
 local modSettings_checkbox = Instance.new("Frame")
-modSettings_checkbox.Name = "text"
+modSettings_checkbox.Name = "checkbox"
 modSettings_checkbox.BackgroundTransparency = 1
 modSettings_checkbox.Size = UDim2.new(1, 0, 0.05, 0)
 modSettings_checkbox.ZIndex = modSettings.ZIndex + 1
@@ -410,6 +413,53 @@ modSettings_checkboxValueHitbox.Image = ""
 modSettings_checkboxValueHitbox.HoverImage = ""
 modSettings_checkboxValueHitbox.ZIndex = modSettings.ZIndex + 2
 
+local modSettings_choose = Instance.new("Frame")
+modSettings_choose.Name = "choose"
+modSettings_choose.BackgroundTransparency = 1
+modSettings_choose.Size = UDim2.new(1, 0, 0.05, 0)
+modSettings_choose.ZIndex = modSettings.ZIndex + 1
+
+local modSettings_chooseTitle = Instance.new("TextLabel", modSettings_choose)
+modSettings_chooseTitle.Name = "title"
+modSettings_chooseTitle.BackgroundTransparency = 1
+modSettings_chooseTitle.Size = UDim2.new(1, 0, 1, 0)
+modSettings_chooseTitle.Font = Enum.Font.Nunito
+modSettings_chooseTitle.TextXAlignment = Enum.TextXAlignment.Left
+modSettings_chooseTitle.TextColor3 = Color3.new(1, 1, 1)
+modSettings_chooseTitle.TextScaled = true
+modSettings_chooseTitle.Text = "Title"
+modSettings_chooseTitle.ZIndex = modSettings.ZIndex + 1
+
+local modSettings_choose_option = Instance.new("Frame")
+modSettings_choose_option.Name = "choose-option"
+modSettings_choose_option.BackgroundTransparency = 0.4
+modSettings_choose_option.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+modSettings_choose_option.Size = UDim2.new(1, 0, 0.05, 0)
+modSettings_choose_option.ZIndex = modSettings.ZIndex + 1
+
+local modSettings_choose_optionCorner = Instance.new("UICorner", modSettings_choose_option)
+modSettings_choose_optionCorner.CornerRadius = UDim.new(1, 0)
+
+local modSettings_choose_optionTitle = Instance.new("TextLabel", modSettings_choose_option)
+modSettings_choose_optionTitle.Name = "title"
+modSettings_choose_optionTitle.BackgroundTransparency = 1
+modSettings_choose_optionTitle.Position = UDim2.new(.02, 0, 0, 0)
+modSettings_choose_optionTitle.Size = UDim2.new(1, 0, 1, 0)
+modSettings_choose_optionTitle.Font = Enum.Font.Nunito
+modSettings_choose_optionTitle.TextXAlignment = Enum.TextXAlignment.Left
+modSettings_choose_optionTitle.TextColor3 = Color3.new(1, 1, 1)
+modSettings_choose_optionTitle.TextScaled = true
+modSettings_choose_optionTitle.Text = "Title"
+modSettings_choose_optionTitle.ZIndex = modSettings.ZIndex + 1
+
+local modSettings_choose_optionHitbox = Instance.new("ImageButton", modSettings_choose_option)
+modSettings_choose_optionHitbox.Name = "hitbox"
+modSettings_choose_optionHitbox.BackgroundTransparency = 1
+modSettings_choose_optionHitbox.Size = UDim2.new(1, 0, 1, 0)
+modSettings_choose_optionHitbox.Image = ""
+modSettings_choose_optionHitbox.HoverImage = ""
+modSettings_choose_optionHitbox.ZIndex = modSettings.ZIndex + 2
+
 local isSettings = false
 local mods = {}
 local function buildSettings(mod, obj)
@@ -422,71 +472,7 @@ local function buildSettings(mod, obj)
 	
 	local i = 1
 	for k, v in pairs(obj) do
-		if v.type == "key" then
-			local function getKeybinds()
-				local keybinds = {}
-
-				for _, md in pairs(mods) do
-					if md == mod then continue end
-					for _, sts in pairs(md.settings) do
-						if sts.type == "key" and sts.value ~= 0 then table.insert(keybinds, sts.value) end
-					end
-				end
-
-				return keybinds
-			end
-			local function getColor(kbs, vl)
-				if table.find(kbs, vl) then return Color3.new(1, 0, 0)
-				else return Color3.new(1, 1, 1) end
-			end
-
-			local key = modSettings_key:Clone()
-			key.LayoutOrder = i
-			key.Name = k
-			key.title.Text = v.title
-			key.value.Text = getKeyName(v.value)
-			key.value.TextColor3 = getColor(getKeybinds(), v.value)
-			key.Parent = setts
-
-			local ev, evv
-			local tooched = false
-			ev = key.value.Activated:Connect(function()
-				tooched = not tooched
-
-				if tooched then
-					mod.isChangingKeybind = true
-					key.value.BackgroundColor3 = Color3.fromHSV(0.333333, 1, 0.470588)
-					key.value.Text = "Waiting for Input..."
-					key.value.TextColor3 = Color3.fromRGB(216, 216, 216)
-
-					evv = UIS.InputBegan:Connect(function(kb, ch)
-						if ch then return end
-						if kb.UserInputType ~= Enum.UserInputType.Keyboard then return end
-
-						if evv then evv:Disconnect() end
-						local kebs = getKeybinds()
-						
-						v.value = kb.KeyCode.Value
-						key.value.TextColor3 = Color3.new(1, 1, 1)
-						key.value.Text = getKeyName(v.value)
-						key.value.TextColor3 = getColor(kebs, v.value)
-						key.value.BackgroundColor3 = Color3.fromHSV(0, 0, 0.235294)
-						tooched = not tooched
-						wait(.2)
-						if not tooched then mod.isChangingKeybind = false end
-					end)
-					table.insert(stsEvents, evv)
-				else
-					mod.isChangingKeybind = false
-					if evv then evv:Disconnect() end
-					key.value.TextColor3 = Color3.new(1, 1, 1)
-					key.value.Text = getKeyName(v.value)
-					key.value.TextColor3 = getColor(getKeybinds(), v.value)
-					key.value.BackgroundColor3 = Color3.fromHSV(0, 0, 0.235294)
-				end
-			end)
-			table.insert(stsEvents, ev)
-		elseif v.type == "number" then
+		if v.type == "number" then
 			local numb = modSettings_number:Clone()
 			numb.LayoutOrder = i
 			numb.Name = k
@@ -552,6 +538,104 @@ local function buildSettings(mod, obj)
 				set(v.value)
 			end)
 			table.insert(stsEvents, ev)
+		elseif v.type == "key" then
+			local function getKeybinds()
+				local keybinds = {}
+
+				for _, md in pairs(mods) do
+					if md == mod then continue end
+					for _, sts in pairs(md.settings) do
+						if sts.type == "key" and sts.value ~= 0 then table.insert(keybinds, sts.value) end
+					end
+				end
+
+				return keybinds
+			end
+			local function getColor(kbs, vl)
+				if table.find(kbs, vl) then return Color3.new(1, 0, 0)
+				else return Color3.new(1, 1, 1) end
+			end
+
+			local key = modSettings_key:Clone()
+			key.LayoutOrder = i
+			key.Name = k
+			key.title.Text = v.title
+			key.value.Text = getKeyName(v.value)
+			key.value.TextColor3 = getColor(getKeybinds(), v.value)
+			key.Parent = setts
+
+			local ev, evv
+			local tooched = false
+			ev = key.value.Activated:Connect(function()
+				tooched = not tooched
+
+				if tooched then
+					mod.isChangingKeybind = true
+					key.value.BackgroundColor3 = Color3.fromHSV(0.333333, 1, 0.470588)
+					key.value.Text = "Waiting for Input..."
+					key.value.TextColor3 = Color3.fromRGB(216, 216, 216)
+
+					evv = UIS.InputBegan:Connect(function(kb, ch)
+						if ch then return end
+						if kb.UserInputType ~= Enum.UserInputType.Keyboard then return end
+
+						if evv then evv:Disconnect() end
+						local kebs = getKeybinds()
+
+						v.value = kb.KeyCode.Value
+						key.value.TextColor3 = Color3.new(1, 1, 1)
+						key.value.Text = getKeyName(v.value)
+						key.value.TextColor3 = getColor(kebs, v.value)
+						key.value.BackgroundColor3 = Color3.fromHSV(0, 0, 0.235294)
+						tooched = not tooched
+						wait(.2)
+						if not tooched then mod.isChangingKeybind = false end
+					end)
+					table.insert(stsEvents, evv)
+				else
+					mod.isChangingKeybind = false
+					if evv then evv:Disconnect() end
+					key.value.TextColor3 = Color3.new(1, 1, 1)
+					key.value.Text = getKeyName(v.value)
+					key.value.TextColor3 = getColor(getKeybinds(), v.value)
+					key.value.BackgroundColor3 = Color3.fromHSV(0, 0, 0.235294)
+				end
+			end)
+			table.insert(stsEvents, ev)
+		elseif v.type == "choose" then
+			local choose = modSettings_choose:Clone()
+			choose.LayoutOrder = i
+			choose.Name = k
+			choose.title.Text = v.title
+			choose.Parent = setts
+			
+			local lol = {}
+			
+			local function choose(kk)
+				for i, xd in pairs(lol) do
+					local lol = 0.2
+					if i == kk then tweens:Create(xd, TweenInfo.new(lol), { BackgroundColor3 = Color3.fromRGB(195, 195, 195) }):Play()
+					else tweens:Create(xd, TweenInfo.new(lol), { BackgroundColor3 = Color3.fromRGB(60, 60, 60) }):Play() end
+				end
+				v.value = kk
+			end
+			
+			for ii, vv in pairs(v.options) do
+				i += 1
+				local opt = modSettings_choose_option:Clone()
+				table.insert(lol, opt)
+				opt.LayoutOrder = i
+				opt.Name = k .. "-" .. ii
+				opt.title.Text = vv
+				if v.value == ii then opt.BackgroundColor3 = Color3.fromRGB(195, 195, 195)
+				else opt.BackgroundColor3 = Color3.fromRGB(60, 60, 60) end
+				opt.Parent = setts
+				
+				ev = opt.hitbox.Activated:Connect(function()
+					choose(ii)
+				end)
+				table.insert(stsEvents, ev)
+			end
 		end
 		i += 1
 	end
@@ -1133,6 +1217,131 @@ mods = {
 			mod.disc:Destroy()
 			mod.disc = nil
 			mouse.TargetFilter = mod.filter
+		end,
+	},
+	{
+		name = "PlayerESP",
+		id = "pesp",
+		description = "See all players through walls, basically like XRay.",
+		settings = createOptions({
+			color = {
+				type = "choose",
+				title = "Color",
+				value = 1,
+				options = {
+					"Team color (or White)",
+					"White",
+					"Gray",
+					"Blue",
+					"Cyan",
+					"Red",
+					"Green",
+					"Yellow",
+					"Black",
+					"Rainbow (may lag)"
+				}
+			},
+			team = {
+				type = "checkbox",
+				title = "Ignore own team",
+				value = true
+			}
+		}),
+		onEnable = function(mod)
+			mod.colors = {
+				nil,
+				Color3.fromRGB(255, 255, 255),
+				Color3.fromRGB(127, 127, 127),
+				Color3.fromRGB(0, 0, 255),
+				Color3.fromRGB(0, 255, 255),
+				Color3.fromRGB(255, 0, 0),
+				Color3.fromRGB(0, 255, 0),
+				Color3.fromRGB(255, 255, 0),
+				Color3.fromRGB(0, 0, 0),
+				nil
+			}
+			mod.rainbowHue = 0
+			mod.parts = {}
+			
+			local gg = Instance.new("ViewportFrame", gui)
+			gg.Name = "esp"
+			gg.Size = UDim2.new(1, 0, 1, 0)
+			gg.BorderSizePixel = 0
+			gg.BorderColor3 = Color3.new()
+			gg.BackgroundColor3 = Color3.new()
+			gg.BackgroundTransparency = 1
+			gg.ZIndex = -1
+			
+			mod.gui = gg
+		end,
+		tick = function(mod)
+			local gg = mod.gui
+			
+			gg.CurrentCamera = workspace.CurrentCamera
+			if mod.rainbowHue >= 255 then mod.rainbowHue = 0 end
+			
+			local plrs = {}
+			for _, p in pairs(game.Players:GetChildren()) do
+				if p.UserId == plr.UserId then continue end
+				if mod.settings.team.value and p.Team == plr.Team and plr.Team and p.Team then continue end
+				
+				if p.Character then table.insert(plrs, p) end
+			end
+			
+			for _, xdd in pairs(gg:GetChildren()) do
+				for _, xd in pairs(plrs) do
+					if xd.UserId == xdd.Name then
+						for _, xddd in pairs(xd.Character:GetChildren()) do
+							if xddd:IsA("BasePart") then mod.parts[xddd] = nil end
+						end
+						continue
+					end
+				end
+			end
+			
+			for _, pl in pairs(plrs) do
+				if not gg:FindFirstChild(pl.UserId) then
+					local lmao = Instance.new("Model", gg)
+					lmao.Name = pl.UserId
+				end
+				
+				local lel = gg:FindFirstChild(pl.UserId)
+				
+				for _, xd in pairs(pl.Character:GetChildren()) do
+					if xd:IsA("BasePart") then
+						if mod.parts[xd] then
+							local prt = mod.parts[xd]
+							prt.CFrame = xd.CFrame
+							prt.Size = xd.Size
+							if mod.settings.color.value == 1 then
+								local clr = Color3.new(1, 1, 1)
+								if pl.TeamColor then clr = pl.TeamColor.Color end 
+								prt.Color = clr
+							elseif mod.settings.color.value == 10 then
+								prt.Color = Color3.fromHSV(mod.rainbowHue / 255, 1, 1)
+							else prt.Color = mod.colors[mod.settings.color.value] end
+						else
+							local arch = xd.Archivable
+							xd.Archivable = true
+							local prt = xd:Clone()
+							prt:ClearAllChildren()
+							xd.Archivable = arch
+							
+							prt.Material = Enum.Material.SmoothPlastic
+							prt.Parent = lel
+							prt.Anchored = true
+							prt.Transparency = 0
+							mod.parts[xd] = prt
+						end
+					end
+				end
+			end
+			
+			mod.rainbowHue += 0.5
+		end,
+		onDisable = function(mod)
+			mod.gui:Destroy()
+			mod.parts = {}
 		end,
 	}
 }
