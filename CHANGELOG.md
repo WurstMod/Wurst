@@ -4,9 +4,9 @@
 ### Added
 - New modules:
   * PlayerESP
+  * PlaySound
 ### Coming Soon
 - New modules:
-  * PlaySound
   * Animations
 
 ## v1.3.1 [05/07/2021]
