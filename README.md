@@ -19,7 +19,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/dev/sc
   <summary>v1.4.0</summary>
   
   ```lua
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/blob/1bdf30d7b95b0ce6aa6c91b5420c44f65df21bc7/script.lua"))
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/c58d2cbd38919be1fdf2affbf2c19c0f2c8816c6/script.lua"))
   ```
 </details>
 
