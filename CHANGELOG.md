@@ -1,9 +1,11 @@
 # Changelog
 
-## v1.4.0 [UNRELEASED]
+## v1.4.0 [07/07/2021]
 ### Added
 - New modules:
   * PlayerESP
+### Coming Soon
+- New modules:
   * PlaySound
   * Animations
 
