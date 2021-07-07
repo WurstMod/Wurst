@@ -82,7 +82,7 @@ local function findPlr(str, multiple)
 end
 
 local config = {}
-config.version = "v1.3.2"
+config.version = "v1.4.0"
 config.github = {}
 config.github.name = "WurstMod/Wurst/"
 config.github.branch = "dev"
