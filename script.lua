@@ -1370,6 +1370,7 @@ mods = {
 			local snd = Instance.new("Sound")
 			mod.snd = snd
 			snd.SoundId = "rbxassetid://" .. mod.settings.sound.value
+			snd.Parent = workspace
 			repeat wait() until snd.IsLoaded
 			snd:Play()
 		end,
