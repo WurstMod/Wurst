@@ -1381,6 +1381,57 @@ mods = {
 			mod.snd:Destroy()
 			mod.snd = nil
 		end,
+	},
+	{
+		name = "Animation",
+		id = "animtn",
+		description = "Plays an animation.",
+		settings = createOptions({
+			animation = {
+				type = "choose",
+				title = "Animation",
+				value = 1,
+				options = {
+					"Dance1 [R6-R15]",
+					"Dance2 [R6-R15]",
+					"Dance3 [R6-R15]"
+				}
+			}
+		}),
+		onEnable = function(mod)
+			local r15anims = {
+				"7060091835",
+				"7060097097",
+				"7060099231"
+			}
+			local r6anims = {
+				"7060281579",
+				"7060301237",
+				"7060304399"
+			}
+			
+			local function disable()
+				modDid[mod.id] = false
+				modTogEv[mod.id]:Fire()
+			end
+
+			if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and not r15anims[mod.settings.animation.value] then disable() return end
+			if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R6 and not r6anims[mod.settings.animation.value] then disable() return end
+			
+			local animd = ""
+			if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then animd = r6anims[mod.settings.animation.value] end
+			if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then animd = r15anims[mod.settings.animation.value] end
+			
+			local animxd = Instance.new("Animation", workspace)
+			animxd.AnimationId = "http://www.roblox.com/asset/?id=" .. animd
+			local anmt = plr.Character.Humanoid:LoadAnimation(animxd)
+			anmt:Play()
+			mod.anim = anmt
+		end,
+		tick = function() end,
+		onDisable = function(mod)
+			mod.anim:Stop()
+		end
 	}
 }
 
