@@ -153,6 +153,7 @@ titleIcon.AnchorPoint = Vector2.new(0, 0.5)
 titleIcon.Position = UDim2.new(0, 0, 0.5, 0)
 titleIcon.Size = UDim2.new(0.42, 0, 1, 0)
 titleIcon.Image = "rbxassetid://6973883824"
+if config.github.branch == "dev" then titleIcon.Image = "rbxassetid://7065535337" end
 titleIcon.ScaleType = Enum.ScaleType.Fit
 titleIcon.ZIndex = config.gui.z + #gui:GetDescendants()
 
@@ -679,7 +680,11 @@ mods = {
 				D = 0,
 				E = 0,
 				Q = 0
-			}
+			},
+			lastPos = Vector3.new(),
+			delta = Vector2.new(),
+			camX = 0,
+			camY = 0
 		},
 		onEnable = function(mod)
 			for _, g in pairs(plr.PlayerGui:GetChildren()) do
@@ -693,9 +698,15 @@ mods = {
 				mod.data.freecamCores[k] = game.StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType[k])
 				game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType[k], false)
 			end
-			
+
 			local function freecamKeyb(act, state, inp)
 				mod.data.freecamKeyboard[inp.KeyCode.Name] = state == Enum.UserInputState.Begin and 1 or 0
+				return Enum.ContextActionResult.Sink
+			end
+			local function freecamMouseWheel(act, state, inp)
+				tweens:Create(workspace.CurrentCamera, TweenInfo.new(0.13, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+					FieldOfView = workspace.CurrentCamera.FieldOfView - (inp.Position.Z * 3) 
+				}):Play()
 				return Enum.ContextActionResult.Sink
 			end
 
@@ -707,10 +718,13 @@ mods = {
 				Enum.KeyCode.E, Enum.KeyCode.O,
 				Enum.KeyCode.Q, Enum.KeyCode.U
 			)
+			Context:BindActionAtPriority("FreecamMouseWheel", freecamMouseWheel, false, Enum.ContextActionPriority.High.Value, Enum.UserInputType.MouseWheel)
 
-			freecamCF = workspace.CurrentCamera.CFrame
-			freecamCamTyp = workspace.CurrentCamera.CameraType
-			freecamCamCF = workspace.CurrentCamera.CFrame
+			mod.data.freecamCF = workspace.CurrentCamera.CFrame
+			mod.data.freecamOffset = workspace.CurrentCamera.CFrame.p - plr.Character.Head.CFrame.p
+			mod.data.freecamZoom = workspace.CurrentCamera.FieldOfView
+			mod.data.freecamCamTyp = workspace.CurrentCamera.CameraType
+			mod.data.freecamCamCF = workspace.CurrentCamera.CFrame
 		end,
 		onDisable = function(mod)
 			for g, v in pairs(mod.data.freecamGUIs) do
@@ -721,6 +735,7 @@ mods = {
 			end
 
 			Context:UnbindAction("FreecamKeyboard")
+			Context:UnbindAction("FreecamMouseWheel")
 			mod.data.freecamKeyboard = {
 				W = 0,
 				A = 0,
@@ -729,30 +744,49 @@ mods = {
 				E = 0,
 				Q = 0
 			}
+			mod.data.camY = 0
+			mod.data.camX = 0
 
 			local ts = tweens:Create(workspace.CurrentCamera, TweenInfo.new(0.25), {
-				CFrame = freecamCamCF
+				CFrame = CFrame.new(plr.Character.Head.CFrame.p + mod.data.freecamOffset)
+			})
+			local ts2 = tweens:Create(workspace.CurrentCamera, TweenInfo.new(0.25), {
+				FieldOfView = mod.data.freecamZoom
 			})
 			ts:Play()
+			ts2:Play()
 			ts.Completed:Wait()
-			workspace.CurrentCamera.CameraType = freecamCamTyp
+			workspace.CurrentCamera.CameraType = mod.data.freecamCamTyp
 		end,
 		tick = function(mod)
 			workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
-
+			UIS.MouseBehavior = Enum.MouseBehavior.LockCenter
+			
+			local thing = (workspace.CurrentCamera.FieldOfView / 70) / 1.75
 			local val = Vector3.new(
 				mod.data.freecamKeyboard.D - mod.data.freecamKeyboard.A,
 				mod.data.freecamKeyboard.E - mod.data.freecamKeyboard.Q,
 				mod.data.freecamKeyboard.S - mod.data.freecamKeyboard.W
-			)
+			) * Vector3.new(1.1 + thing, 1.1 + thing, 1.1 + thing)
 
 			if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then val = val * Vector3.new(0.5, 0.5, 0.5) end
 			if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then val = val * Vector3.new(2, 2, 2) end
-
-			local cf = freecamCF:ToWorldSpace(CFrame.new(val))
+			
+			local sens = 0.2 + thing
+			
+			local delta = UIS:GetMouseDelta()
+			local dx = delta.X * sens
+			local dy = delta.Y * sens
+			
+			mod.data.camX = mod.data.camX - dx * 0.4
+			mod.data.camY = math.clamp(mod.data.camY - dy * 0.4, -90, 90)
+			
+			local cf
+			cf = mod.data.freecamCF:ToWorldSpace(CFrame.new(val))
+			cf = CFrame.new(cf.p) * CFrame.Angles(0, math.rad(mod.data.camX), 0) * CFrame.Angles(math.rad(mod.data.camY), 0, 0)
 
 			workspace.CurrentCamera.CFrame = cf
-			freecamCF = cf
+			mod.data.freecamCF = cf
 		end,
 	},
 	{
@@ -1284,7 +1318,7 @@ mods = {
 			
 			local plrs = {}
 			for _, p in pairs(game.Players:GetChildren()) do
-				--if p.UserId == plr.UserId then continue end
+				if p.UserId == plr.UserId then continue end
 				if mod.settings.team.value and p.Team == plr.Team and plr.Team and p.Team then continue end
 				
 				if p.Character then table.insert(plrs, p) end
@@ -1292,12 +1326,23 @@ mods = {
 			
 			for _, xdd in pairs(gg:GetChildren()) do
 				if not xdd:IsA("Model") then continue end
+				local yas = false
 				for _, xd in pairs(plrs) do
-					if xd.UserId == xdd.Name then
-						for _, xddd in pairs(xd.Character:GetChildren()) do
-							if xddd:IsA("BasePart") then mod.parts[xddd] = nil end
+					if tostring(xd.UserId) == xdd.Name then yas = true end
+				end
+				if not yas then
+					local revs = {}
+					for k, v in pairs(mod.parts) do
+						revs[v] = k
+					end
+					for _, xddd in pairs(xdd:GetChildren()) do
+						if xddd:IsA("BasePart") then
+							local th = revs[xddd]
+							mod.parts[th] = nil
+							xddd:Destroy()
 						end
 					end
+					xdd:Destroy()
 				end
 			end
 			
@@ -1382,57 +1427,57 @@ mods = {
 			mod.snd = nil
 		end,
 	},
-	{
-		name = "Animation",
-		id = "animtn",
-		description = "Plays an animation.",
-		settings = createOptions({
-			animation = {
-				type = "choose",
-				title = "Animation",
-				value = 1,
-				options = {
-					"Dance1 [R6-R15]",
-					"Dance2 [R6-R15]",
-					"Dance3 [R6-R15]"
-				}
-			}
-		}),
-		onEnable = function(mod)
-			local r15anims = {
-				"7060091835",
-				"7060097097",
-				"7060099231"
-			}
-			local r6anims = {
-				"7060281579",
-				"7060301237",
-				"7060304399"
-			}
+	--{
+	--	name = "Animation",
+	--	id = "animtn",
+	--	description = "Plays an animation.",
+	--	settings = createOptions({
+	--		animation = {
+	--			type = "choose",
+	--			title = "Animation",
+	--			value = 1,
+	--			options = {
+	--				"Dance1 [R6-R15]",
+	--				"Dance2 [R6-R15]",
+	--				"Dance3 [R6-R15]"
+	--			}
+	--		}
+	--	}),
+	--	onEnable = function(mod)
+	--		local r15anims = {
+	--			"7060091835",
+	--			"7060097097",
+	--			"7060099231"
+	--		}
+	--		local r6anims = {
+	--			"7060281579",
+	--			"7060301237",
+	--			"7060304399"
+	--		}
 			
-			local function disable()
-				modDid[mod.id] = false
-				modTogEv[mod.id]:Fire()
-			end
+	--		local function disable()
+	--			modDid[mod.id] = false
+	--			modTogEv[mod.id]:Fire()
+	--		end
 
-			if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and not r15anims[mod.settings.animation.value] then disable() return end
-			if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R6 and not r6anims[mod.settings.animation.value] then disable() return end
+	--		if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and not r15anims[mod.settings.animation.value] then disable() return end
+	--		if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R6 and not r6anims[mod.settings.animation.value] then disable() return end
 			
-			local animd = ""
-			if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then animd = r6anims[mod.settings.animation.value] end
-			if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then animd = r15anims[mod.settings.animation.value] end
+	--		local animd = ""
+	--		if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then animd = r6anims[mod.settings.animation.value] end
+	--		if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then animd = r15anims[mod.settings.animation.value] end
 			
-			local animxd = Instance.new("Animation", workspace)
-			animxd.AnimationId = "http://www.roblox.com/asset/?id=" .. animd
-			local anmt = plr.Character.Humanoid:LoadAnimation(animxd)
-			anmt:Play()
-			mod.anim = anmt
-		end,
-		tick = function() end,
-		onDisable = function(mod)
-			mod.anim:Stop()
-		end
-	}
+	--		local animxd = Instance.new("Animation", workspace)
+	--		animxd.AnimationId = "http://www.roblox.com/asset/?id=" .. animd
+	--		local anmt = plr.Character.Humanoid:LoadAnimation(animxd)
+	--		anmt:Play()
+	--		mod.anim = anmt
+	--	end,
+	--	tick = function() end,
+	--	onDisable = function(mod)
+	--		mod.anim:Stop()
+	--	end
+	--}
 }
 
 log("Loaded GUI")
