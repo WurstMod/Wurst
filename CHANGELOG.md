@@ -5,7 +5,8 @@
 - New modules:
   * PlayerESP
   * PlaySound
-  * Animations
+### Fixed
+- Camera rotation & zooming in Freecam
 
 ## v1.3.1 [05/07/2021]
 - Pressing an unknown key no longer toggles all modules on
