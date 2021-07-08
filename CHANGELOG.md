@@ -5,6 +5,7 @@
 - New modules:
   * PlayerESP
   * PlaySound
+- Logo now displays 'Wurst DEV' while using dev branch
 ### Fixed
 - Camera rotation & zooming in Freecam
 
