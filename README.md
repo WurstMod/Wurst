@@ -1,7 +1,7 @@
 # You are **_not_** allowed to use our work without crediting us.
 
 <div align="center">
-    <img src="https://raw.githubusercontent.com/WurstMod/Wurst/dev/wurst.png" />
+    <img src="https://raw.githubusercontent.com/WurstMod/Wurst/dev/wurstdev.png" />
 </div>
 
 ----
