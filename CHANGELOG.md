@@ -1,11 +1,12 @@
 # Changelog
 
-## v1.4.0 [UNRELEASED]
+## v1.4.0 [09/07/2021]
 ### Added
 - New modules:
   * PlayerESP
   * PlaySound
 - Logo now displays 'Wurst DEV' while using dev branch
+- When using Flight, E & Q now moves up/down instead of UpVector
 ### Fixed
 - Camera rotation & zooming in Freecam
 
