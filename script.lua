@@ -1007,12 +1007,12 @@ mods = {
 			local vel = CFrame.new()
 			local cf = workspace.CurrentCamera.CFrame
 			
-			vel = vel - cf.RightVector * keyb.A		-- A
-			vel = vel + cf.RightVector * keyb.D		-- D
-			vel = vel - cf.LookVector * keyb.S		-- S
-			vel = vel + cf.LookVector * keyb.W		-- W
-			vel = vel - cf.UpVector * keyb.Q		-- Q
-			vel = vel + cf.UpVector * keyb.E		-- E
+			vel = vel - cf.RightVector * keyb.A			-- A
+			vel = vel + cf.RightVector * keyb.D			-- D
+			vel = vel - cf.LookVector * keyb.S			-- S
+			vel = vel + cf.LookVector * keyb.W			-- W
+			vel = vel - Vector3.new(0, 1, 0) * keyb.Q	-- Q
+			vel = vel + Vector3.new(0, 1, 0) * keyb.E	-- Q
 			
 			for _, a in pairs(plr.Character:GetChildren()) do
 				if a:IsA("BasePart") then
@@ -1088,7 +1088,7 @@ mods = {
 		settings = createOptions(),
 		onEnable = function(mod)
 			if not charCheck(plr.Character) then return end
-			local power = 100000
+			local power = 1000000
 			mod.flingVel = Instance.new("BodyAngularVelocity")
 			mod.flingVel.AngularVelocity = Vector3.new(0, power, 0)
 			mod.flingVel.MaxTorque = Vector3.new(0, power, 0)
