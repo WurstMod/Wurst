@@ -14,6 +14,8 @@ WurstMod is a **mod** for Roblox, inspired by Wurst for Minecraft™
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/main/script.lua"))
 ```
+Most games have `loadstring()` **disabled**. If so, visit the URL and copy the script inside.  
+Use the copied script instead of the `loadstring()` script
 ## Different Versions
 <details>
   <summary>v1.4.0</summary>
