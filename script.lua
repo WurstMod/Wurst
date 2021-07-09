@@ -82,7 +82,7 @@ local function findPlr(str, multiple)
 end
 
 local config = {}
-config.version = "v1.4.0"
+config.version = "v1.5.0"
 config.github = {}
 config.github.name = "WurstMod/Wurst/"
 config.github.branch = "dev"
@@ -238,6 +238,8 @@ modlistMod.Size = UDim2.new(1, 0, 0.05, 0)
 modlistMod.Font = Enum.Font.Nunito
 modlistMod.TextScaled = true
 modlistMod.TextColor3 = Color3.new()
+modlistMod.TextStrokeColor3 = Color3.new(1, 1, 1)
+modlistMod.TextStrokeTransparency = 0
 modlistMod.TextXAlignment = Enum.TextXAlignment.Left
 modlistMod.ZIndex = modlist.ZIndex + 1
 
@@ -721,7 +723,7 @@ mods = {
 			Context:BindActionAtPriority("FreecamMouseWheel", freecamMouseWheel, false, Enum.ContextActionPriority.High.Value, Enum.UserInputType.MouseWheel)
 
 			mod.data.freecamCF = workspace.CurrentCamera.CFrame
-			mod.data.freecamOffset = workspace.CurrentCamera.CFrame.p - plr.Character.Head.CFrame.p
+			mod.data.freecamOffset = workspace.CurrentCamera.CFrame - plr.Character.PrimaryPart.CFrame.p
 			mod.data.freecamZoom = workspace.CurrentCamera.FieldOfView
 			mod.data.freecamCamTyp = workspace.CurrentCamera.CameraType
 			mod.data.freecamCamCF = workspace.CurrentCamera.CFrame
@@ -748,7 +750,7 @@ mods = {
 			mod.data.camX = 0
 
 			local ts = tweens:Create(workspace.CurrentCamera, TweenInfo.new(0.25), {
-				CFrame = CFrame.new(plr.Character.Head.CFrame.p + mod.data.freecamOffset)
+				CFrame = plr.Character.PrimaryPart.CFrame:ToWorldSpace(mod.data.freecamOffset)
 			})
 			local ts2 = tweens:Create(workspace.CurrentCamera, TweenInfo.new(0.25), {
 				FieldOfView = mod.data.freecamZoom
@@ -1478,6 +1480,31 @@ mods = {
 	--		mod.anim:Stop()
 	--	end
 	--}
+	{
+		name = "FullBright",
+		id = "flbrht",
+		description = "Makes your game fullbright (duh).",
+		settings = createOptions(),
+		onEnable = function(mod)
+			mod.ambient = game.Lighting.Ambient
+			mod.brightness = game.Lighting.Brightness
+			mod.outdoorambient = game.Lighting.OutdoorAmbient
+			mod.exposurecompensation = game.Lighting.ExposureCompensation
+		end,
+		tick = function(mod)
+			game.Lighting.Ambient = Color3.new(1, 1, 1)
+			game.Lighting.Brightness = 3
+			game.Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+			game.Lighting.ExposureCompensation = 0
+		end,
+		onDisable = function(mod)
+			game.Lighting.Ambient = mod.ambient
+			game.Lighting.Brightness = mod.brightness 
+			game.Lighting.OutdoorAmbient = mod.outdoorambient
+			game.Lighting.ExposureCompensation = mod.exposurecompensation
+			
+		end,
+	}
 }
 
 log("Loaded GUI")
@@ -1602,7 +1629,8 @@ for imod, mod in pairs(mods) do
 			mdl.LayoutOrder = imod
 			mdl.Parent = modlist
 			tweens:Create(mdl, TweenInfo.new(0.2), {
-				TextTransparency = 0
+				TextTransparency = 0,
+				TextStrokeTransparency = 0
 			}):Play()
 		else
 			for _, ed in pairs(modEvs[mod.id]) do ed:Disconnect() end
@@ -1620,7 +1648,8 @@ for imod, mod in pairs(mods) do
 					spawn(function()
 
 						local tws = tweens:Create(mdl, TweenInfo.new(0.2), {
-							TextTransparency = 1
+							TextTransparency = 1,
+							TextStrokeTransparency = 1
 						})
 						tws:Play()
 						tws.Completed:Wait()
