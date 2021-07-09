@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.5.0 [UNRELEASED]
+### Added
+- New Modules
+  * FullBright
+  * InfiniteJump
+- WurstMod settings
+- Game-Specific Modules
+  * MM2
+
 ## v1.4.0 [09/07/2021]
 ### Added
 - New modules:
