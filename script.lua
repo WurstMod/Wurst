@@ -1030,7 +1030,6 @@ mods = {
 		name = "Sit",
 		id = "sit",
 		description = "Makes you sit.",
-		deathDisable = true,
 		settings = createOptions(),
 		onEnable = function(mod)
 			if not charCheck(plr.Character) then return end
@@ -1105,7 +1104,6 @@ mods = {
 		name = "KillAura",
 		id = "klaura",
 		description = "Makes your character look at anyone near the radius.",
-		deathDisable = true,
 		settings = createOptions({
 			walls = {
 				type = "checkbox",
@@ -1132,6 +1130,8 @@ mods = {
 		}),
 		onEnable = function() end,
 		tick = function(mod)
+			if not charCheck(plr.Character) then return end
+			
 			local targets = {}
 			for _, pl in pairs(game.Players:GetChildren()) do
 				if pl.UserId == plr.UserId then continue end
@@ -1216,7 +1216,6 @@ mods = {
 				value = 268
 			}
 		}),
-		deathDisable = true,
 		onEnable = function(mod)
 			local part = Instance.new("Part")
 			part.Shape = Enum.PartType.Ball
@@ -1503,6 +1502,29 @@ mods = {
 			game.Lighting.OutdoorAmbient = mod.outdoorambient
 			game.Lighting.ExposureCompensation = mod.exposurecompensation
 			
+		end,
+	},
+	{
+		name = "InfiniteJump",
+		id = "infjmp",
+		description = "Allows you to jump infinitely.",
+		settings = createOptions(),
+		onEnable = function(mod)
+			mod.ev = UIS.InputBegan:Connect(function(k, c)
+				if not charCheck(plr.Character) then return end
+				if c then return end
+				if k.KeyCode == Enum.KeyCode.Space then
+					local st = plr.Character.Humanoid:GetState()
+					if st == Enum.HumanoidStateType.Jumping or st == Enum.HumanoidStateType.Freefall then
+						plr.Character.Humanoid.UseJumpPower = true
+						plr.Character.PrimaryPart.Velocity = Vector3.new(0, plr.Character.Humanoid.JumpPower, 0) 
+					end
+				end
+			end)
+		end,
+		onDisable = function(mod)
+			mod.ev:Disconnec()
+			mod.ev = nil
 		end,
 	}
 }
