@@ -5,6 +5,8 @@
 - New Modules
   * FullBright
   * InfiniteJump
+- Fixed restoring camera pos in Freecam
+- ModulesList's modules now have a white TextStroke
 - WurstMod settings
 - Game-Specific Modules
   * MM2
