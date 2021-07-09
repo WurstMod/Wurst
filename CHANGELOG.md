@@ -4,6 +4,8 @@
 ### Added
 - New Modules
   * FullBright
+- Fixed restoring camera pos in Freecam
+- ModulesList's modules now have a white TextStroke
 ### Coming Soon
 - New Modules
   * InfiniteJump
