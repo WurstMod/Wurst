@@ -6,6 +6,7 @@
   * PlayerESP
   * PlaySound
 - Logo now displays 'Wurst DEV' while using dev branch
+- When using Flight, E & Q now moves up/down instead of UpVector
 ### Fixed
 - Camera rotation & zooming in Freecam
 
