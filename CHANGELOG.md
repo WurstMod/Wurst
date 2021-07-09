@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.4.0 [08/07/2021]
+## v1.4.0 [09/07/2021]
 ### Added
 - New modules:
   * PlayerESP
