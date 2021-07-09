@@ -10,6 +10,8 @@
 - WurstMod settings
 - Game-Specific Modules
   * MM2
+### Removed
+- Removed disabling on death for most modules
 
 ## v1.4.0 [09/07/2021]
 ### Added
