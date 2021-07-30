@@ -23,7 +23,7 @@ local function getKeyName(keyc)
 	return inverted[tonumber(keyc)] or "[UNKNOWN]"
 end
 local function charCheck(char)
-	return (not not char) and not not (char and char:FindFirstChild("Humanoid")) and (char and char:FindFirstChild("Humanoid") and char.Humanoid.Health > 0)
+	return (not not char) and not not (char and char:FindFirstChildWhichIsA("Humanoid")) and (char and char:FindFirstChildWhichIsA("Humanoid") and char.Humanoid.Health > 0)
 end
 local function createOptions(obj)
 	local o = {
@@ -1526,6 +1526,28 @@ mods = {
 			mod.ev:Disconnec()
 			mod.ev = nil
 		end,
+	},
+	{
+		name = "GodMode",
+		id = "godmd",
+		description = "Makes you invincible (most of the time)",
+		settings = createOptions(),
+		deathDisable = true,
+		onEnable = function(mod)
+			local hmn = plr.Character.Humanoid
+			local l = hmn:Clone()
+			l.Name = "1"
+			if workspace.CurrentCamera.CameraSubject == hmn then workspace.CurrentCamera.CameraSubject = l end
+			hmn.Name = "1"
+			l.Parent = plr.Character
+			l.Name = "Humanoid"
+			wait(.1)
+			hmn:Destroy()
+			mod.l = l
+		end,
+		onDisable = function(mod)
+			plr.Character:FindFirstChildWhichIsA("Humanoid").Health = 0
+		end,
 	}
 }
 
@@ -1596,7 +1618,6 @@ ev = game:GetService("RunService").Stepped:Connect(function()
 		if modToggle[mod.id] and modDid[mod.id] then
 			if mod.tick then
 				local scs, xd = pcall(mod.tick, mod, mod)
-				if not scs then print(scs, xd) end
 			end
 		end
 	end
@@ -1629,7 +1650,6 @@ for imod, mod in pairs(mods) do
 					if not modToggle[m.id] and table.find(mod.autoEnable, m.id) then modTogEv[m.id]:Fire() end
 				end end
 				local scs, xd = pcall(mod.onEnable, mod, mod)
-				if not scs then print(scs, xd) end
 				
 				modDid[mod.id] = true
 			end)
