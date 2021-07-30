@@ -5,11 +5,14 @@
 - New Modules
   * FullBright
   * InfiniteJump
+  * GodMode
 - Fixed restoring camera pos in Freecam
 - ModulesList's modules now have a white TextStroke
 ### Removed
 - Removed disabling on death for most modules
 ### Coming Soon
+- New Modules
+  * MCChat
 - WurstMod settings
 - Game-Specific Modules
   * MM2
