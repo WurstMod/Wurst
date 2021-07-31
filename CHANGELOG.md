@@ -9,13 +9,13 @@
   * BringPlayer
 - Fixed restoring camera pos in Freecam
 - ModulesList's modules now have a white TextStroke
+- Game-Specific Modules
+  * MM2
 ### Removed
 - Removed disabling on death for most modules
 ### Coming Soon
 - Settings saving to clouds
 - WurstMod settings
-- Game-Specific Modules
-  * MM2
 ### Maybe
 - New Modules
   * MCChat
