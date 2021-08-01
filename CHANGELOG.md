@@ -7,6 +7,7 @@
   * InfiniteJump
   * GodMode
   * BringPlayer
+  * AntiAFK
 - Fixed restoring camera pos in Freecam
 - ModulesList's modules now have a white TextStroke
 - Game-Specific Modules
