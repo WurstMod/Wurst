@@ -24,9 +24,9 @@ local function getKeyName(keyc)
 	return inverted[tonumber(keyc)] or "[UNKNOWN]"
 end
 local function charCheck(char)
-	return (not not char) and not not (char and char:FindFirstChildWhichIsA("Humanoid")) and (char and char:FindFirstChildWhichIsA("Humanoid") and char.Humanoid.Health > 0)
+	return (not not char) and not not (char and char:FindFirstChildOfClass("Humanoid")) and (char and char:FindFirstChildOfClass("Humanoid") and char.Humanoid.Health > 0)
 end
-local function createOptions(obj)
+local function createOptions(obj, fc)
 	local o = {
 		keybind = {
 			type = "key",
@@ -40,6 +40,8 @@ local function createOptions(obj)
 			o[x] = xd
 		end
 	end
+	
+	if fc then fc(o) end
 
 	return o
 end
@@ -166,12 +168,17 @@ modules.Position = UDim2.new(0.5, 0, 0.5, 0)
 modules.Size = UDim2.new(0.45, 0, 0.96, 0)
 modules.ZIndex = config.gui.z + #gui:GetDescendants()
 
-local modulesList = Instance.new("Frame", modules)
+local modulesList = Instance.new("ScrollingFrame", modules)
 modulesList.Name = "list"
 modulesList.AnchorPoint = Vector2.new(0, 1)
 modulesList.BackgroundTransparency = 1
 modulesList.Position = UDim2.new(0, 0, 1, 0)
 modulesList.Size = UDim2.new(1, 0, 0.9, 0)
+
+modulesList.ScrollBarThickness = 0
+modulesList.ScrollBarImageTransparency = 1
+modulesList.CanvasSize = UDim2.new()
+
 modulesList.Visible = false
 modulesList.ZIndex = config.gui.z + #gui:GetDescendants()
 
@@ -656,6 +663,116 @@ local function destroySettings()
 	end
 end
 
+local mm2Data = {
+	sherrif = nil,
+	murderer = nil,
+	
+	identified = false,
+	round = false
+}
+local mm2Evs = {
+	notifications = Instance.new("BindableEvent")
+}
+
+if game.PlaceId == 142823291 then
+	local tmr = game.ReplicatedStorage.GetTimer:InvokeServer()
+	
+	local tev
+	local ttevs = {}
+	local tevs = {}
+
+	local function dod()
+		for _, xd in pairs(tevs) do
+			for _, xx in pairs(xd) do
+				xx:Disconnect()
+			end
+		end
+		for _, xd in pairs(ttevs) do
+			xd:Disconnect()
+		end
+		
+		local function check(splr)
+			tevs[splr.UserId] = {}
+			local function thing(x)
+				if x.Name == "Gun" and mm2Data.sherrif ~= splr then
+					mm2Data.sherrif = splr
+					mm2Evs.notifications:Fire("RoleNotifications", splr.Name .. " is now the Sherrif!", game.Players:GetUserThumbnailAsync(splr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100), 120)
+				elseif x.Name == "Knife" and mm2Data.murderer ~= splr then
+					mm2Data.murderer = splr
+					mm2Evs.notifications:Fire("RoleNotifications", splr.Name .. " is now the Murderer!", game.Players:GetUserThumbnailAsync(splr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100), 120)
+				end
+			end
+
+			for _, x in pairs(splr:WaitForChild("Backpack"):GetChildren()) do
+				thing(x)
+			end
+			tev = splr:WaitForChild("Backpack").ChildAdded:Connect(function(x)
+				thing(x)
+			end)
+			table.insert(tevs[splr.UserId], tev)
+			local function cch(chr)
+				if not chr then return end
+				tev = chr.ChildAdded:Connect(function(x)
+					thing(x)
+				end)
+				table.insert(tevs[splr.UserId], tev)
+				table.insert(events, tev)
+
+				for _, x in pairs(chr:GetChildren()) do
+					thing(x)
+				end
+			end
+			cch(splr.Character)
+			tev = splr.CharacterAdded:Connect(cch)
+			table.insert(tevs[splr.UserId], tev)
+			table.insert(events, tev)
+		end
+
+		for _, splr in pairs(game.Players:GetChildren()) do
+			check(splr)
+		end
+
+		tev = game.Players.PlayerAdded:Connect(check)
+		table.insert(ttevs, tev)
+		tev = game.Players.PlayerRemoving:Connect(function(splr)
+			wait()
+			for _, e in pairs(tevs[splr.UserId]) do
+				e:Disconnect()
+			end
+			tevs[splr.UserId] = nil
+		end)
+		table.insert(ttevs, tev)
+	end
+	
+	if tmr < 0 then
+		mm2Evs.notifications:Fire("RoleNotifications", "There's currently no ongoing round")
+		mm2Data.round = false
+		mm2Data.sherrif = nil
+		mm2Data.murderer = nil
+		mm2Data.identified = true
+	else
+		mm2Evs.notifications:Fire("RoleNotifications", "The round is currently ongoing")
+		mm2Data.round = true
+		mm2Data.identified = true
+	end
+	
+	game.ReplicatedStorage.Remotes.Gameplay.RoundEndFade.OnClientEvent:Connect(function()
+		mm2Evs.notifications:Fire("RoleNotifications", "The round has ended")
+		mm2Data.round = false
+		mm2Data.sherrif = nil
+		mm2Data.murderer = nil
+		mm2Data.identified = true
+	end)
+	game.ReplicatedStorage.RoundStart.OnClientEvent:Connect(function()
+		mm2Evs.notifications:Fire("RoleNotifications", "The round has started")
+		dod()
+		mm2Data.round = true
+		mm2Data.identified = true
+	end)
+	
+	dod()
+end
+
 local modToggle = {}
 local modEvs = {}
 local modDid = {}
@@ -1108,12 +1225,13 @@ mods = {
 	},
 	{
 		name = "KillAura",
+		gameBonus = 142823291,
 		id = "klaura",
 		description = "Makes your character look at anyone near the radius.",
 		settings = createOptions({
 			walls = {
 				type = "checkbox",
-				title = "Check Walls",
+				title = "Check Walls (indev)",
 				value = false
 			},
 			looking = {
@@ -1132,8 +1250,21 @@ mods = {
 				value = 10,
 				min = 25,
 				max = 5000
+			},
+			sort = {
+				type = "choose",
+				title = "Sort",
+				value = 1,
+				options = {
+					"Nearest"
+				}
 			}
-		}),
+		}, function(md)
+			if game.PlaceId == 142823291 then
+				table.insert(md.sort.options, "MM2 Murderer")
+				table.insert(md.sort.options, "MM2 Sherrif")
+			end
+		end),
 		onEnable = function() end,
 		tick = function(mod)
 			if not charCheck(plr.Character) then return end
@@ -1172,19 +1303,26 @@ mods = {
 			local target
 			if #targets == 1 then target = targets[1]
 			elseif #targets > 1 then
-				table.sort(targets, function(a, b)
-					local function getMgn(pl)
-						local prm = pl.Character.PrimaryPart
-						local magnc = (prm.Position - plr.Character.PrimaryPart.Position).Magnitude
-						return magnc
+				if mod.settings.sort.value == 1 then
+					table.sort(targets, function(a, b)
+						local function getMgn(pl)
+							local prm = pl.Character.PrimaryPart
+							local magnc = (prm.Position - plr.Character.PrimaryPart.Position).Magnitude
+							return magnc
+						end
+						
+						local aMgn = getMgn(a)
+						local bMgn = getMgn(b)
+						
+						return bMgn > aMgn
+					end)
+					target = targets[1]
+				else
+					for _, x in pairs(targets) do
+						if x.UserId == mm2Data.murderer.UserId and (mod.settings.sort.value == 2) then target = x end
+						if x.UserId == mm2Data.sherrif.UserId and (mod.settings.sort.value == 3) then target = x end
 					end
-					
-					local aMgn = getMgn(a)
-					local bMgn = getMgn(b)
-					
-					return bMgn > aMgn
-				end)
-				target = targets[1]
+				end
 			end
 			
 			if target then
@@ -1261,6 +1399,7 @@ mods = {
 	},
 	{
 		name = "PlayerESP",
+		gameBonus = 142823291,
 		id = "pesp",
 		description = "See all players through walls, basically like XRay.",
 		settings = createOptions({
@@ -1286,7 +1425,11 @@ mods = {
 				title = "Ignore own team",
 				value = true
 			}
-		}),
+		}, function(md)
+			if game.PlaceId == 142823291 then
+				table.insert(md.color.options, "MM2 Role")
+			end
+		end),
 		onEnable = function(mod)
 			mod.colors = {
 				nil,
@@ -1298,6 +1441,7 @@ mods = {
 				Color3.fromRGB(0, 255, 0),
 				Color3.fromRGB(255, 255, 0),
 				Color3.fromRGB(0, 0, 0),
+				nil,
 				nil
 			}
 			mod.rainbowHue = 0
@@ -1365,6 +1509,10 @@ mods = {
 					espColor = pl.TeamColor.Color
 				elseif mod.settings.color.value == 10 then
 					espColor = Color3.fromHSV(mod.rainbowHue, 1, 1)
+				elseif mod.settings.color.value == 11 then
+					if mm2Data.sherrif and (mm2Data.sherrif.UserId == pl.UserId) then espColor = Color3.new(0, 0, 1)
+					elseif mm2Data.murderer and (mm2Data.murderer.UserId == pl.UserId) then espColor = Color3.new(1, 0, 0)
+					else espColor = Color3.new(0, 1, 0) end
 				else
 					espColor = mod.colors[mod.settings.color.value]
 				end
@@ -1387,7 +1535,8 @@ mods = {
 							prt.Material = Enum.Material.SmoothPlastic
 							prt.Parent = lel
 							prt.Anchored = true
-							prt.Transparency = 0
+							if xd.Transparency > 0.5 then prt.Transparency = 0
+							else prt.Transparency = 0 end
 							mod.parts[xd] = prt
 						end
 					end
@@ -1517,6 +1666,7 @@ mods = {
 		settings = createOptions(),
 		onEnable = function(mod)
 			mod.ev = UIS.InputBegan:Connect(function(k, c)
+				print("hello")
 				if not charCheck(plr.Character) then return end
 				if c then return end
 				if k.KeyCode == Enum.KeyCode.Space then
@@ -1529,8 +1679,7 @@ mods = {
 			end)
 		end,
 		onDisable = function(mod)
-			mod.ev:Disconnec()
-			mod.ev = nil
+			mod.ev:Disconnect()
 		end,
 	},
 	{
@@ -1551,7 +1700,7 @@ mods = {
 			hmn:Destroy()
 		end,
 		onDisable = function(mod)
-			plr.Character:FindFirstChildWhichIsA("Humanoid").Health = 0
+			plr.Character:FindFirstChildOfClass("Humanoid").Health = 0
 		end,
 	},
 	{
@@ -1566,9 +1715,7 @@ mods = {
 			}
 		}),
 		onEnable = function(mod)
-			local splr = findPlr(mod.settings.plr.value, false) or {
-				Character = workspace.Dummy
-			}
+			local splr = findPlr(mod.settings.plr.value, false)
 			if not splr or not splr.Character or not splr.Character.PrimaryPart then
 				modDid[mod.id] = false
 				modTogEv[mod.id]:Fire()
@@ -1615,10 +1762,169 @@ mods = {
 			plr.Character.PrimaryPart.CFrame = cap
 			workspace.CurrentCamera.CameraSubject = hmn
 		end,
+	},
+	{
+		name = "AntiAFK",
+		id = "aafk",
+		description = "Forces your player not to get kicked once AFK",
+		settings = createOptions(),
+		onEnable = function(mod)
+			local vu = game:GetService("VirtualUser")
+			mod.ev = plr.Idled:Connect(function()
+				vu:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+				wait(1)
+				vu:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+			end)
+		end,
+		onDisable = function(mod)
+			mod.ev:Disconnect()
+		end,
+	},
+	{
+		name = "HideGUI",
+		id = "hdgi",
+		description = "Hides the gui. Literally what did you expect. (requires a keybind)",
+		settings = createOptions(),
+		onEnable = function(mod)
+			local ky = mod.settings.keybind.value
+			if ky == 0 then
+				modDid[mod.id] = false
+				modTogEv[mod.id]:Fire()
+				return
+			end
+			
+			gui.Enabled = false
+		end,
+		onDisable = function(mod)
+			gui.Enabled = true
+		end,
+	},
+	{
+		name = "Invisible",
+		id = "invsb",
+		description = "Makes you invisible. (most of the time - kinda buggy)",
+		settings = createOptions(),
+		deathDisable = true,
+		onEnable = function(mod)
+			mod.chr = plr.Character
+			
+			local rch = plr.Character.Archivable
+			plr.Character.Archivable = true
+			local nchar = plr.Character:Clone()
+			plr.Character.Archivable = rch
+			
+			for _, d in pairs(nchar:GetDescendants()) do
+				if d:IsA("BasePart") then d.Transparency += 0.5 end
+			end
+			
+			nchar.Name = "N_" .. plr.Name
+			nchar.Parent = workspace
+			
+			mod.nchr = nchar
+			
+			workspace.CurrentCamera.CameraSubject = nchar.Humanoid
+			plr.Character = nchar
+			
+			spawn(function()
+				wait(.025)
+				nchar.Animate.Disabled = true
+				wait()
+				nchar.Animate.Disabled = false
+			end)
+		end,
+		tick = function(mod)
+			if mod.chr then
+				mod.chr.PrimaryPart.Velocity = Vector3.new()
+				mod.chr.PrimaryPart.CFrame = CFrame.new(Vector3.new(0, workspace.FallenPartsDestroyHeight + 10, 0))
+			end
+		end,
+		onDisable = function(mod)
+			mod.chr.PrimaryPart.CFrame = mod.nchr.PrimaryPart.CFrame
+			
+			workspace.CurrentCamera.CameraSubject = mod.chr.Humanoid
+			plr.Character = mod.chr
+			mod.nchr:Destroy()
+		end,
+	},
+	{
+		name = "RoleNotifications",
+		id = "mm2_rlnotif",
+		description = "[MM2] Sends Notifications everyone round, with who has which role",
+		gameSpecific = 142823291,
+		settings = createOptions(),
+		onEnable = function(mod)
+			mod.ev = mm2Evs.notifications.Event:Connect(function(ttl, txt, img, time)
+				pcall(game.StarterGui.SetCore, game.StarterGui, "SendNotification", {
+					Title = ttl,
+					Text = txt,
+					Icon = img,
+					Duration = 5 or time
+				})
+			end)
+			table.insert(events, mod.ev)
+			
+			if mm2Data.round then mm2Evs.notifications:Fire("RoleNotifications", "The round is currently ongoing")
+			else mm2Evs.notifications:Fire("RoleNotifications", "Waiting for the round to start") end
+
+			if mm2Data.sherrif then mm2Evs.notifications:Fire("RoleNotifications", mm2Data.sherrif.Name .. " is now the Sherrif!", game.Players:GetUserThumbnailAsync(mm2Data.sherrif.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100), 120) end
+			if mm2Data.murderer then mm2Evs.notifications:Fire("RoleNotifications", mm2Data.murderer.Name .. " is now the Murderer!", game.Players:GetUserThumbnailAsync(mm2Data.murderer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100), 120) end
+		end,
+		onDisable = function(mod)
+			mod.ev:Disconnect()
+		end,
+	},
+	{
+		name = "TpToGun",
+		id = "mm2_ttg",
+		description = "[MM2] Teleports you to the gun",
+		gameSpecific = 142823291,
+		settings = createOptions({
+			gun = {
+				type = "string",
+				title = "[DEBUG]_droppedgun_name",
+				value = "GunDrop"
+			}
+		}),
+		onEnable = function(mod)
+			local gun = workspace:FindFirstChild(mod.settings.gun.value)
+			
+			if not gun then
+				modDid[mod.id] = false
+				modTogEv[mod.id]:Fire()
+				return
+			end
+			
+			if gun:IsA("Model") then gun = gun.PrimaryPart end
+			
+			local cap = plr.Character.PrimaryPart.CFrame
+			local offs = plr.Character.PrimaryPart.Position - plr.Character.Head.Position - 2
+			local vl = plr.Character.PrimaryPart.Velocity
+			
+			local ps = gun.Position + offs
+			local enb = true
+			
+			spawn(function()
+				while enb and wait() do
+					plr.Character.PrimaryPart.CFrame = CFrame.new(ps)
+					plr.Character.PrimaryPart.Velocity = Vector3.new()
+				end
+			end)
+			
+			wait(.25)
+			enb = false
+			wait()
+			plr.Character.PrimaryPart.Velocity = vl
+			plr.Character.PrimaryPart.CFrame = cap
+			
+			modDid[mod.id] = false
+			modTogEv[mod.id]:Fire()
+			return
+		end,
 	}
 }
 
 log("Loaded GUI")
+local speclColor = Color3.new(1, .8, 0)
 
 ev = game:GetService("RunService").Heartbeat:Connect(function()
 	local isHover = false
@@ -1632,6 +1938,8 @@ ev = game:GetService("RunService").Heartbeat:Connect(function()
 			
 			if modObj then
 				description.Text = modObj.description
+				if modObj.gameSpecific == game.PlaceId then description.TextColor3 = speclColor
+				else description.TextColor3 = Color3.new() end
 				local het = 0.03
 				local lines = modObj.extraLines or 1
 				description.Size = UDim2.new(1, 0, het * lines, 0)
@@ -1691,7 +1999,15 @@ ev = game:GetService("RunService").Stepped:Connect(function()
 end)
 table.insert(events, ev)
 
+-- resize modules' list
+ev = game:GetService("RunService").Stepped:Connect(function()
+	modulesListGrid.CellSize = UDim2.new(0.5, -2, 0, (modulesList.AbsoluteSize.Y * 0.1) - 2)
+	modulesList.CanvasSize = UDim2.new(0, 0, 0, modulesListGrid.AbsoluteContentSize.Y)
+end)
+table.insert(events, ev)
+
 for imod, mod in pairs(mods) do
+	if mod.gameSpecific and mod.gameSpecific ~= game.PlaceId then continue end
 	mod.settings = mod.settings or createOptions()
 	modToggle[mod.id] = false
 	modEvs[mod.id] = {}
@@ -1699,6 +2015,7 @@ for imod, mod in pairs(mods) do
 	local modul = tempModule:Clone()
 	modul.Name = mod.id
 	modul.title.Text = mod.name
+	if mod.gameSpecific == game.PlaceId or mod.gameBonus == game.PlaceId then modul.title.TextColor3 = speclColor end
 	modul.LayoutOrder = imod
 	modul.Parent = modulesList
 	
@@ -1717,6 +2034,7 @@ for imod, mod in pairs(mods) do
 					if not modToggle[m.id] and table.find(mod.autoEnable, m.id) then modTogEv[m.id]:Fire() end
 				end end
 				local scs, xd = pcall(mod.onEnable, mod, mod)
+				print(scs, xd)
 				
 				modDid[mod.id] = true
 			end)
