@@ -14,10 +14,10 @@
 - ModulesList's modules now have a white TextStroke
 - Game-Specific Modules
   * MM2
+- Settings saving to clouds
 ### Removed
 - Removed disabling on death for most modules
 ### Coming Soon
-- Settings saving to clouds
 - WurstMod settings
 ### Maybe
 - New Modules
