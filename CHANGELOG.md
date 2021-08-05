@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.5.0 [09/07/2021]
+## v1.5.0 [05/08/2021]
 ### Added
 - New Modules
   * FullBright
@@ -15,13 +15,9 @@
 - Game-Specific Modules
   * MM2
 - Settings saving to clouds
+- WurstMod settings
 ### Removed
 - Removed disabling on death for most modules
-### Coming Soon
-- WurstMod settings
-### Maybe
-- New Modules
-  * MCChat
 
 ## v1.4.0 [09/07/2021]
 ### Added
