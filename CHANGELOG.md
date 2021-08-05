@@ -1,15 +1,21 @@
 # Changelog
 
-## v1.5.0 [UNRELEASED]
+## v1.5.0 [05/08/2021]
 ### Added
 - New Modules
   * FullBright
   * InfiniteJump
+  * GodMode
+  * BringPlayer
+  * AntiAFK
+  * Invisible
+  * HideGUI
 - Fixed restoring camera pos in Freecam
 - ModulesList's modules now have a white TextStroke
-- WurstMod settings
 - Game-Specific Modules
   * MM2
+- Settings saving to clouds
+- WurstMod settings
 ### Removed
 - Removed disabling on death for most modules
 
