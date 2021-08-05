@@ -2,11 +2,20 @@ local plr = game.Players.LocalPlayer
 local mouse = plr:GetMouse()
 plr:WaitForChild("PlayerGui")
 if not plr.Character then plr.CharacterAdded:Wait() end
+
+globalUrl = "https://wurst-mod.tk/"
+if game:GetService("RunService"):IsStudio() then 
+	http_request = game.ReplicatedStorage.postWeb
+else
+	getgenv().http_request = http_request or request or (http and http.request) or syn.request 
+end
 wait(.1)
 
 local UIS = game:GetService("UserInputService")
 local Context = game:GetService("ContextActionService")
 local tweens = game:GetService("TweenService")
+local texts = game:GetService("TextService")
+local httpr = game:GetService("HttpService")
 
 local keycodes = {["Unknown"]=0,["Backspace"]=8,["Tab"]=9,["Clear"]=12,["Return"]=13,["Pause"]=19,["Escape"]=27,["Space"]=32,["QuotedDouble"]=34,["Hash"]=35,["Dollar"]=36,["Percent"]=37,["Ampersand"]=38,["Quote"]=39,["LeftParenthesis"]=40,["RightParenthesis"]=41,["Asterisk"]=42,["Plus"]=43,["Comma"]=44,["Minus"]=45,["Period"]=46,["Slash"]=47,["Zero"]=48,["One"]=49,["Two"]=50,["Three"]=51,["Four"]=52,["Five"]=53,["Six"]=54,["Seven"]=55,["Eight"]=56,["Nine"]=57,["Colon"]=58,["Semicolon"]=59,["LessThan"]=60,["Equals"]=61,["GreaterThan"]=62,["Question"]=63,["At"]=64,["LeftBracket"]=91,["BackSlash"]=92,["RightBracket"]=93,["Caret"]=94,["Underscore"]=95,["Backquote"]=96,["A"]=97,["B"]=98,["C"]=99,["D"]=100,["E"]=101,["F"]=102,["G"]=103,["H"]=104,["I"]=105,["J"]=106,["K"]=107,["L"]=108,["M"]=109,["N"]=110,["O"]=111,["P"]=112,["Q"]=113,["R"]=114,["S"]=115,["T"]=116,["U"]=117,["V"]=118,["W"]=119,["X"]=120,["Y"]=121,["Z"]=122,["LeftCurly"]=123,["Pipe"]=124,["RightCurly"]=125,["Tilde"]=126,["Delete"]=127,["KeypadZero"]=256,["KeypadOne"]=257,["KeypadTwo"]=258,["KeypadThree"]=259,["KeypadFour"]=260,["KeypadFive"]=261,["KeypadSix"]=262,["KeypadSeven"]=263,["KeypadEight"]=264,["KeypadNine"]=265,["KeypadPeriod"]=266,["KeypadDivide"]=267,["KeypadMultiply"]=268,["KeypadMinus"]=269,["KeypadPlus"]=270,["KeypadEnter"]=271,["KeypadEquals"]=272,["Up"]=273,["Down"]=274,["Right"]=275,["Left"]=276,["Insert"]=277,["Home"]=278,["End"]=279,["PageUp"]=280,["PageDown"]=281,["LeftShift"]=304,["RightShift"]=303,["LeftMeta"]=310,["RightMeta"]=309,["LeftAlt"]=308,["RightAlt"]=307,["LeftControl"]=306,["RightControl"]=305,["CapsLock"]=301,["NumLock"]=300,["ScrollLock"]=302,["LeftSuper"]=311,["RightSuper"]=312,["Mode"]=313,["Compose"]=314,["Help"]=315,["Print"]=316,["SysReq"]=317,["Break"]=318,["Menu"]=319,["Power"]=320,["Euro"]=321,["Undo"]=322,["F1"]=282,["F2"]=283,["F3"]=284,["F4"]=285,["F5"]=286,["F6"]=287,["F7"]=288,["F8"]=289,["F9"]=290,["F10"]=291,["F11"]=292,["F12"]=293,["F13"]=294,["F14"]=295,["F15"]=296,["World0"]=160,["World1"]=161,["World2"]=162,["World3"]=163,["World4"]=164,["World5"]=165,["World6"]=166,["World7"]=167,["World8"]=168,["World9"]=169,["World10"]=170,["World11"]=171,["World12"]=172,["World13"]=173,["World14"]=174,["World15"]=175,["World16"]=176,["World17"]=177,["World18"]=178,["World19"]=179,["World20"]=180,["World21"]=181,["World22"]=182,["World23"]=183,["World24"]=184,["World25"]=185,["World26"]=186,["World27"]=187,["World28"]=188,["World29"]=189,["World30"]=190,["World31"]=191,["World32"]=192,["World33"]=193,["World34"]=194,["World35"]=195,["World36"]=196,["World37"]=197,["World38"]=198,["World39"]=199,["World40"]=200,["World41"]=201,["World42"]=202,["World43"]=203,["World44"]=204,["World45"]=205,["World46"]=206,["World47"]=207,["World48"]=208,["World49"]=209,["World50"]=210,["World51"]=211,["World52"]=212,["World53"]=213,["World54"]=214,["World55"]=215,["World56"]=216,["World57"]=217,["World58"]=218,["World59"]=219,["World60"]=220,["World61"]=221,["World62"]=222,["World63"]=223,["World64"]=224,["World65"]=225,["World66"]=226,["World67"]=227,["World68"]=228,["World69"]=229,["World70"]=230,["World71"]=231,["World72"]=232,["World73"]=233,["World74"]=234,["World75"]=235,["World76"]=236,["World77"]=237,["World78"]=238,["World79"]=239,["World80"]=240,["World81"]=241,["World82"]=242,["World83"]=243,["World84"]=244,["World85"]=245,["World86"]=246,["World87"]=247,["World88"]=248,["World89"]=249,["World90"]=250,["World91"]=251,["World92"]=252,["World93"]=253,["World94"]=254,["World95"]=255,["ButtonX"]=1000,["ButtonY"]=1001,["ButtonA"]=1002,["ButtonB"]=1003,["ButtonR1"]=1004,["ButtonL1"]=1005,["ButtonR2"]=1006,["ButtonL2"]=1007,["ButtonR3"]=1008,["ButtonL3"]=1009,["ButtonStart"]=1010,["ButtonSelect"]=1011,["DPadLeft"]=1012,["DPadRight"]=1013,["DPadUp"]=1014,["DPadDown"]=1015,["Thumbstick1"]=1016,["Thumbstick2"]=1017}
 
@@ -23,9 +32,9 @@ local function getKeyName(keyc)
 	return inverted[tonumber(keyc)] or "[UNKNOWN]"
 end
 local function charCheck(char)
-	return (not not char) and not not (char and char:FindFirstChild("Humanoid")) and (char and char:FindFirstChild("Humanoid") and char.Humanoid.Health > 0)
+	return (not not char) and not not (char and char:FindFirstChildOfClass("Humanoid")) and (char and char:FindFirstChildOfClass("Humanoid") and char.Humanoid.Health > 0)
 end
-local function createOptions(obj)
+local function createOptions(obj, fc)
 	local o = {
 		keybind = {
 			type = "key",
@@ -39,6 +48,8 @@ local function createOptions(obj)
 			o[x] = xd
 		end
 	end
+	
+	if fc then fc(o) end
 
 	return o
 end
@@ -82,15 +93,16 @@ local function findPlr(str, multiple)
 end
 
 local config = {}
-config.version = "v1.4.0"
+config.version = "v1.5.0"
 config.github = {}
 config.github.name = "WurstMod/Wurst/"
-config.github.branch = "main"
+config.github.branch = "dev"
 config.gui = {}
 config.gui.name = "wurst"
 config.gui.z = 1000
-if game.JobId ~= "00000000-0000-0000-0000-000000000000" then config.latestVersion = game:HttpGet("https://raw.githubusercontent.com/" .. config.github.name .. config.github.branch .. "/version")
-else config.latestVersion = game.ReplicatedStorage.reqWeb:InvokeServer("https://raw.githubusercontent.com/" .. config.github.name .. config.github.branch .. "/version") end
+local veru = globalUrl .. config.github.branch .. "/lVersion"
+if not game:GetService("RunService"):IsStudio() then config.latestVersion = game:HttpGet(veru)
+else config.latestVersion = game.ReplicatedStorage.reqWeb:InvokeServer(veru) end
 -- used only for development :)
 
 config.latestVersion = config.latestVersion:gsub(string.format("\n"), "")
@@ -165,12 +177,17 @@ modules.Position = UDim2.new(0.5, 0, 0.5, 0)
 modules.Size = UDim2.new(0.45, 0, 0.96, 0)
 modules.ZIndex = config.gui.z + #gui:GetDescendants()
 
-local modulesList = Instance.new("Frame", modules)
+local modulesList = Instance.new("ScrollingFrame", modules)
 modulesList.Name = "list"
 modulesList.AnchorPoint = Vector2.new(0, 1)
 modulesList.BackgroundTransparency = 1
 modulesList.Position = UDim2.new(0, 0, 1, 0)
 modulesList.Size = UDim2.new(1, 0, 0.9, 0)
+
+modulesList.ScrollBarThickness = 0
+modulesList.ScrollBarImageTransparency = 1
+modulesList.CanvasSize = UDim2.new()
+
 modulesList.Visible = false
 modulesList.ZIndex = config.gui.z + #gui:GetDescendants()
 
@@ -238,6 +255,8 @@ modlistMod.Size = UDim2.new(1, 0, 0.05, 0)
 modlistMod.Font = Enum.Font.Nunito
 modlistMod.TextScaled = true
 modlistMod.TextColor3 = Color3.new()
+modlistMod.TextStrokeColor3 = Color3.new(1, 1, 1)
+modlistMod.TextStrokeTransparency = 0
 modlistMod.TextXAlignment = Enum.TextXAlignment.Left
 modlistMod.ZIndex = modlist.ZIndex + 1
 
@@ -463,6 +482,44 @@ modSettings_choose_optionHitbox.ZIndex = modSettings.ZIndex + 2
 
 local isSettings = false
 local mods = {}
+
+local function saveSettings()
+
+	local combined = {}
+	for _, x in pairs(mods) do table.insert(combined, {
+		id = x.id,
+		settings = x.settings
+	}) end
+	
+	local dat = {
+		Url = globalUrl .. "api/setSettings?uid=" .. plr.UserId,
+		Method = "POST",
+		Headers = {
+			["Content-Type"] = "application/json"
+		},
+		Body = httpr:JSONEncode({
+			data = combined
+		})
+	}
+	
+	if game:GetService("RunService"):IsStudio() then http_request:InvokeServer(dat)
+	else http_request(dat) end
+end
+local function getSettings()
+	local r, u = nil, globalUrl .. "api/getSettings?uid=" .. plr.UserId
+	if game:GetService("RunService"):IsStudio() then r = game.ReplicatedStorage.reqWeb:InvokeServer(u)
+	else r = game:HttpGet(u) end
+	return httpr:JSONDecode(r)
+end
+
+local function findByKey(o, k, v)
+	local obj
+	for _, a in pairs(o) do
+		if a[k] and a[k] == v then obj = a end
+	end
+	return obj
+end
+
 local function buildSettings(mod, obj)
 	isSettings = true
 	local setts = modSettings:Clone()
@@ -646,11 +703,121 @@ end
 
 local function destroySettings()
 	isSettings = false
-	if modules:FindFirstChild("settings") then modules.settings:Destroy() end
+	if modules:FindFirstChild("settings") then saveSettings(); modules.settings:Destroy() end
 	modulesList.Visible = true
 	for _, e in pairs(stsEvents) do
 		e:Disconnect()
 	end
+end
+
+local mm2Data = {
+	sherrif = nil,
+	murderer = nil,
+	
+	identified = false,
+	round = false
+}
+local mm2Evs = {
+	notifications = Instance.new("BindableEvent")
+}
+
+if game.PlaceId == 142823291 then
+	local tmr = game.ReplicatedStorage.GetTimer:InvokeServer()
+	
+	local tev
+	local ttevs = {}
+	local tevs = {}
+
+	local function dod()
+		for _, xd in pairs(tevs) do
+			for _, xx in pairs(xd) do
+				xx:Disconnect()
+			end
+		end
+		for _, xd in pairs(ttevs) do
+			xd:Disconnect()
+		end
+		
+		local function check(splr)
+			tevs[splr.UserId] = {}
+			local function thing(x)
+				if x.Name == "Gun" and mm2Data.sherrif ~= splr then
+					mm2Data.sherrif = splr
+					mm2Evs.notifications:Fire("RoleNotifications", splr.Name .. " is now the Sherrif!", game.Players:GetUserThumbnailAsync(splr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100), 120)
+				elseif x.Name == "Knife" and mm2Data.murderer ~= splr then
+					mm2Data.murderer = splr
+					mm2Evs.notifications:Fire("RoleNotifications", splr.Name .. " is now the Murderer!", game.Players:GetUserThumbnailAsync(splr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100), 120)
+				end
+			end
+
+			for _, x in pairs(splr:WaitForChild("Backpack"):GetChildren()) do
+				thing(x)
+			end
+			tev = splr:WaitForChild("Backpack").ChildAdded:Connect(function(x)
+				thing(x)
+			end)
+			table.insert(tevs[splr.UserId], tev)
+			local function cch(chr)
+				if not chr then return end
+				tev = chr.ChildAdded:Connect(function(x)
+					thing(x)
+				end)
+				table.insert(tevs[splr.UserId], tev)
+				table.insert(events, tev)
+
+				for _, x in pairs(chr:GetChildren()) do
+					thing(x)
+				end
+			end
+			cch(splr.Character)
+			tev = splr.CharacterAdded:Connect(cch)
+			table.insert(tevs[splr.UserId], tev)
+			table.insert(events, tev)
+		end
+
+		for _, splr in pairs(game.Players:GetChildren()) do
+			check(splr)
+		end
+
+		tev = game.Players.PlayerAdded:Connect(check)
+		table.insert(ttevs, tev)
+		tev = game.Players.PlayerRemoving:Connect(function(splr)
+			wait()
+			for _, e in pairs(tevs[splr.UserId]) do
+				e:Disconnect()
+			end
+			tevs[splr.UserId] = nil
+		end)
+		table.insert(ttevs, tev)
+	end
+	
+	if tmr < 0 then
+		mm2Evs.notifications:Fire("RoleNotifications", "There's currently no ongoing round")
+		mm2Data.round = false
+		mm2Data.sherrif = nil
+		mm2Data.murderer = nil
+		mm2Data.identified = true
+	else
+		mm2Evs.notifications:Fire("RoleNotifications", "The round is currently ongoing")
+		mm2Data.round = true
+		mm2Data.identified = true
+	end
+	
+	game.ReplicatedStorage.Remotes.Gameplay.RoundEndFade.OnClientEvent:Connect(function()
+		mm2Evs.notifications:Fire("RoleNotifications", "The round has ended")
+		mm2Data.round = false
+		mm2Data.sherrif = nil
+		mm2Data.murderer = nil
+		mm2Data.identified = true
+	end)
+	game.ReplicatedStorage.RoundStart.OnClientEvent:Connect(function()
+		mm2Evs.notifications:Fire("RoleNotifications", "The round has started")
+		dod()
+		mm2Data.round = true
+		mm2Data.identified = true
+	end)
+	
+	dod()
 end
 
 local modToggle = {}
@@ -721,10 +888,14 @@ mods = {
 			Context:BindActionAtPriority("FreecamMouseWheel", freecamMouseWheel, false, Enum.ContextActionPriority.High.Value, Enum.UserInputType.MouseWheel)
 
 			mod.data.freecamCF = workspace.CurrentCamera.CFrame
-			mod.data.freecamOffset = workspace.CurrentCamera.CFrame.p - plr.Character.Head.CFrame.p
+			mod.data.freecamOffset = workspace.CurrentCamera.CFrame.p - plr.Character.PrimaryPart.CFrame.p
+			mod.data.freecamOrt = Vector3.new(workspace.CurrentCamera.CFrame:ToEulerAnglesXYZ())
 			mod.data.freecamZoom = workspace.CurrentCamera.FieldOfView
 			mod.data.freecamCamTyp = workspace.CurrentCamera.CameraType
 			mod.data.freecamCamCF = workspace.CurrentCamera.CFrame
+
+			mod.data.camX = -math.deg(mod.data.freecamOrt.X)
+			mod.data.camY = -math.deg(mod.data.freecamOrt.Y)
 		end,
 		onDisable = function(mod)
 			for g, v in pairs(mod.data.freecamGUIs) do
@@ -746,9 +917,10 @@ mods = {
 			}
 			mod.data.camY = 0
 			mod.data.camX = 0
+			local rto = mod.data.freecamOrt
 
 			local ts = tweens:Create(workspace.CurrentCamera, TweenInfo.new(0.25), {
-				CFrame = CFrame.new(plr.Character.Head.CFrame.p + mod.data.freecamOffset)
+				CFrame = CFrame.new(plr.Character.PrimaryPart.CFrame.p + mod.data.freecamOffset) * CFrame.Angles(rto.X, rto.Y, rto.Z)
 			})
 			local ts2 = tweens:Create(workspace.CurrentCamera, TweenInfo.new(0.25), {
 				FieldOfView = mod.data.freecamZoom
@@ -1028,7 +1200,6 @@ mods = {
 		name = "Sit",
 		id = "sit",
 		description = "Makes you sit.",
-		deathDisable = true,
 		settings = createOptions(),
 		onEnable = function(mod)
 			if not charCheck(plr.Character) then return end
@@ -1101,13 +1272,13 @@ mods = {
 	},
 	{
 		name = "KillAura",
+		gameBonus = 142823291,
 		id = "klaura",
 		description = "Makes your character look at anyone near the radius.",
-		deathDisable = true,
 		settings = createOptions({
 			walls = {
 				type = "checkbox",
-				title = "Check Walls",
+				title = "Check Walls (indev)",
 				value = false
 			},
 			looking = {
@@ -1126,10 +1297,25 @@ mods = {
 				value = 10,
 				min = 25,
 				max = 5000
+			},
+			sort = {
+				type = "choose",
+				title = "Sort",
+				value = 1,
+				options = {
+					"Nearest"
+				}
 			}
-		}),
+		}, function(md)
+			if game.PlaceId == 142823291 then
+				table.insert(md.sort.options, "MM2 Murderer")
+				table.insert(md.sort.options, "MM2 Sherrif")
+			end
+		end),
 		onEnable = function() end,
 		tick = function(mod)
+			if not charCheck(plr.Character) then return end
+			
 			local targets = {}
 			for _, pl in pairs(game.Players:GetChildren()) do
 				if pl.UserId == plr.UserId then continue end
@@ -1164,19 +1350,26 @@ mods = {
 			local target
 			if #targets == 1 then target = targets[1]
 			elseif #targets > 1 then
-				table.sort(targets, function(a, b)
-					local function getMgn(pl)
-						local prm = pl.Character.PrimaryPart
-						local magnc = (prm.Position - plr.Character.PrimaryPart.Position).Magnitude
-						return magnc
+				if mod.settings.sort.value == 1 then
+					table.sort(targets, function(a, b)
+						local function getMgn(pl)
+							local prm = pl.Character.PrimaryPart
+							local magnc = (prm.Position - plr.Character.PrimaryPart.Position).Magnitude
+							return magnc
+						end
+						
+						local aMgn = getMgn(a)
+						local bMgn = getMgn(b)
+						
+						return bMgn > aMgn
+					end)
+					target = targets[1]
+				else
+					for _, x in pairs(targets) do
+						if x.UserId == mm2Data.murderer.UserId and (mod.settings.sort.value == 2) then target = x end
+						if x.UserId == mm2Data.sherrif.UserId and (mod.settings.sort.value == 3) then target = x end
 					end
-					
-					local aMgn = getMgn(a)
-					local bMgn = getMgn(b)
-					
-					return bMgn > aMgn
-				end)
-				target = targets[1]
+				end
 			end
 			
 			if target then
@@ -1214,7 +1407,6 @@ mods = {
 				value = 268
 			}
 		}),
-		deathDisable = true,
 		onEnable = function(mod)
 			local part = Instance.new("Part")
 			part.Shape = Enum.PartType.Ball
@@ -1254,6 +1446,7 @@ mods = {
 	},
 	{
 		name = "PlayerESP",
+		gameBonus = 142823291,
 		id = "pesp",
 		description = "See all players through walls, basically like XRay.",
 		settings = createOptions({
@@ -1279,7 +1472,11 @@ mods = {
 				title = "Ignore own team",
 				value = true
 			}
-		}),
+		}, function(md)
+			if game.PlaceId == 142823291 then
+				table.insert(md.color.options, "MM2 Role")
+			end
+		end),
 		onEnable = function(mod)
 			mod.colors = {
 				nil,
@@ -1291,6 +1488,7 @@ mods = {
 				Color3.fromRGB(0, 255, 0),
 				Color3.fromRGB(255, 255, 0),
 				Color3.fromRGB(0, 0, 0),
+				nil,
 				nil
 			}
 			mod.rainbowHue = 0
@@ -1358,6 +1556,10 @@ mods = {
 					espColor = pl.TeamColor.Color
 				elseif mod.settings.color.value == 10 then
 					espColor = Color3.fromHSV(mod.rainbowHue, 1, 1)
+				elseif mod.settings.color.value == 11 then
+					if mm2Data.sherrif and (mm2Data.sherrif.UserId == pl.UserId) then espColor = Color3.new(0, 0, 1)
+					elseif mm2Data.murderer and (mm2Data.murderer.UserId == pl.UserId) then espColor = Color3.new(1, 0, 0)
+					else espColor = Color3.new(0, 1, 0) end
 				else
 					espColor = mod.colors[mod.settings.color.value]
 				end
@@ -1380,7 +1582,8 @@ mods = {
 							prt.Material = Enum.Material.SmoothPlastic
 							prt.Parent = lel
 							prt.Anchored = true
-							prt.Transparency = 0
+							if xd.Transparency > 0.5 then prt.Transparency = 0
+							else prt.Transparency = 0 end
 							mod.parts[xd] = prt
 						end
 					end
@@ -1478,9 +1681,297 @@ mods = {
 	--		mod.anim:Stop()
 	--	end
 	--}
+	{
+		name = "FullBright",
+		id = "flbrht",
+		description = "Makes your game fullbright (duh).",
+		settings = createOptions(),
+		onEnable = function(mod)
+			mod.ambient = game.Lighting.Ambient
+			mod.brightness = game.Lighting.Brightness
+			mod.outdoorambient = game.Lighting.OutdoorAmbient
+			mod.exposurecompensation = game.Lighting.ExposureCompensation
+		end,
+		tick = function(mod)
+			game.Lighting.Ambient = Color3.new(1, 1, 1)
+			game.Lighting.Brightness = 3
+			game.Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+			game.Lighting.ExposureCompensation = 0
+		end,
+		onDisable = function(mod)
+			game.Lighting.Ambient = mod.ambient
+			game.Lighting.Brightness = mod.brightness 
+			game.Lighting.OutdoorAmbient = mod.outdoorambient
+			game.Lighting.ExposureCompensation = mod.exposurecompensation
+			
+		end,
+	},
+	{
+		name = "InfiniteJump",
+		id = "infjmp",
+		description = "Allows you to jump infinitely.",
+		settings = createOptions(),
+		onEnable = function(mod)
+			mod.ev = UIS.InputBegan:Connect(function(k, c)
+				print("hello")
+				if not charCheck(plr.Character) then return end
+				if c then return end
+				if k.KeyCode == Enum.KeyCode.Space then
+					local st = plr.Character.Humanoid:GetState()
+					if st == Enum.HumanoidStateType.Jumping or st == Enum.HumanoidStateType.Freefall then
+						plr.Character.Humanoid.UseJumpPower = true
+						plr.Character.PrimaryPart.Velocity = Vector3.new(0, plr.Character.Humanoid.JumpPower, 0) 
+					end
+				end
+			end)
+		end,
+		onDisable = function(mod)
+			mod.ev:Disconnect()
+		end,
+	},
+	{
+		name = "GodMode",
+		id = "godmd",
+		description = "Makes you invincible (most of the time)",
+		settings = createOptions(),
+		deathDisable = true,
+		onEnable = function(mod)
+			local hmn = plr.Character.Humanoid
+			local l = hmn:Clone()
+			l.Name = "1"
+			if workspace.CurrentCamera.CameraSubject == hmn then workspace.CurrentCamera.CameraSubject = l end
+			hmn.Name = "1"
+			l.Parent = plr.Character
+			l.Name = "Humanoid"
+			wait(.1)
+			hmn:Destroy()
+		end,
+		onDisable = function(mod)
+			plr.Character:FindFirstChildOfClass("Humanoid").Health = 0
+		end,
+	},
+	{
+		name = "BringPlayer",
+		id = "brgplr",
+		description = "Brings a player to you (most of the time)",
+		settings = createOptions({
+			plr = {
+				type = "string",
+				title = "Player",
+				value = "Roblox"
+			}
+		}),
+		onEnable = function(mod)
+			local splr = findPlr(mod.settings.plr.value, false)
+			if not splr or not splr.Character or not splr.Character.PrimaryPart then
+				modDid[mod.id] = false
+				modTogEv[mod.id]:Fire()
+				return
+			end
+			
+			local cap = plr.Character.PrimaryPart.CFrame
+			local hmn = plr.Character.Humanoid
+			hmn.Name = "1"
+			local l = hmn:Clone()
+			l.Parent = plr.Character
+			l.Name = "Humanoid"
+			wait(0.1)
+			hmn:Destroy()
+			hmn = l
+			
+			local sub = workspace.CurrentCamera.CameraSubject
+			workspace.CurrentCamera.CameraSubject = splr.Character
+			plr.Character.Animate.Disabled = true
+			wait(0.1)
+			plr.Character.Animate.Disabled = false
+			plr.Character.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+			for _, v in pairs(plr.Backpack:GetChildren()) do
+				plr.Character.Humanoid:EquipTool(v)
+			end
+
+			local function tpp()
+				if splr.Character and plr.Character then
+					splr.Character.PrimaryPart.CFrame = plr.Character.PrimaryPart.CFrame
+				end
+			end
+			local function tgout()
+				if splr.Character and plr.Character then
+					plr.Character.Humanoid:MoveTo(splr.Character.Head.Position)
+				end
+			end
+			
+			tpp()
+			wait(.1)
+			tpp()
+			wait(.3)
+			tgout()
+			wait(.2)
+			plr.Character.PrimaryPart.CFrame = cap
+			workspace.CurrentCamera.CameraSubject = hmn
+		end,
+	},
+	{
+		name = "AntiAFK",
+		id = "aafk",
+		description = "Forces your player not to get kicked once AFK",
+		settings = createOptions(),
+		onEnable = function(mod)
+			local vu = game:GetService("VirtualUser")
+			mod.ev = plr.Idled:Connect(function()
+				vu:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+				wait(1)
+				vu:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+			end)
+		end,
+		onDisable = function(mod)
+			mod.ev:Disconnect()
+		end,
+	},
+	{
+		name = "HideGUI",
+		id = "hdgi",
+		description = "Hides the gui. Literally what did you expect. (requires a keybind)",
+		settings = createOptions(),
+		onEnable = function(mod)
+			local ky = mod.settings.keybind.value
+			if ky == 0 then
+				modDid[mod.id] = false
+				modTogEv[mod.id]:Fire()
+				return
+			end
+			
+			gui.Enabled = false
+		end,
+		onDisable = function(mod)
+			gui.Enabled = true
+		end,
+	},
+	{
+		name = "Invisible",
+		id = "invsb",
+		description = "Makes you invisible. (most of the time - kinda buggy)",
+		settings = createOptions(),
+		deathDisable = true,
+		onEnable = function(mod)
+			mod.chr = plr.Character
+			
+			local rch = plr.Character.Archivable
+			plr.Character.Archivable = true
+			local nchar = plr.Character:Clone()
+			plr.Character.Archivable = rch
+			
+			for _, d in pairs(nchar:GetDescendants()) do
+				if d:IsA("BasePart") then d.Transparency += 0.5 end
+			end
+			
+			nchar.Name = "N_" .. plr.Name
+			nchar.Parent = workspace
+			
+			mod.nchr = nchar
+			
+			workspace.CurrentCamera.CameraSubject = nchar.Humanoid
+			plr.Character = nchar
+			
+			spawn(function()
+				wait(.025)
+				nchar.Animate.Disabled = true
+				wait()
+				nchar.Animate.Disabled = false
+			end)
+		end,
+		tick = function(mod)
+			if mod.chr then
+				mod.chr.PrimaryPart.Velocity = Vector3.new()
+				mod.chr.PrimaryPart.CFrame = CFrame.new(Vector3.new(0, workspace.FallenPartsDestroyHeight + 10, 0))
+			end
+		end,
+		onDisable = function(mod)
+			mod.chr.PrimaryPart.CFrame = mod.nchr.PrimaryPart.CFrame
+			
+			workspace.CurrentCamera.CameraSubject = mod.chr.Humanoid
+			plr.Character = mod.chr
+			mod.nchr:Destroy()
+		end,
+	},
+	{
+		name = "RoleNotifications",
+		id = "mm2_rlnotif",
+		description = "[MM2] Sends Notifications everyone round, with who has which role",
+		gameSpecific = 142823291,
+		settings = createOptions(),
+		onEnable = function(mod)
+			mod.ev = mm2Evs.notifications.Event:Connect(function(ttl, txt, img, time)
+				pcall(game.StarterGui.SetCore, game.StarterGui, "SendNotification", {
+					Title = ttl,
+					Text = txt,
+					Icon = img,
+					Duration = 5 or time
+				})
+			end)
+			table.insert(events, mod.ev)
+			
+			if mm2Data.round then mm2Evs.notifications:Fire("RoleNotifications", "The round is currently ongoing")
+			else mm2Evs.notifications:Fire("RoleNotifications", "Waiting for the round to start") end
+
+			if mm2Data.sherrif then mm2Evs.notifications:Fire("RoleNotifications", mm2Data.sherrif.Name .. " is now the Sherrif!", game.Players:GetUserThumbnailAsync(mm2Data.sherrif.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100), 120) end
+			if mm2Data.murderer then mm2Evs.notifications:Fire("RoleNotifications", mm2Data.murderer.Name .. " is now the Murderer!", game.Players:GetUserThumbnailAsync(mm2Data.murderer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100), 120) end
+		end,
+		onDisable = function(mod)
+			mod.ev:Disconnect()
+		end,
+	},
+	{
+		name = "TpToGun",
+		id = "mm2_ttg",
+		description = "[MM2] Teleports you to the gun",
+		gameSpecific = 142823291,
+		settings = createOptions({
+			gun = {
+				type = "string",
+				title = "[DEBUG]_droppedgun_name",
+				value = "GunDrop"
+			}
+		}),
+		onEnable = function(mod)
+			local gun = workspace:FindFirstChild(mod.settings.gun.value)
+			
+			if not gun then
+				modDid[mod.id] = false
+				modTogEv[mod.id]:Fire()
+				return
+			end
+			
+			if gun:IsA("Model") then gun = gun.PrimaryPart end
+			
+			local cap = plr.Character.PrimaryPart.CFrame
+			local offs = plr.Character.PrimaryPart.Position - plr.Character.Head.Position - 2
+			local vl = plr.Character.PrimaryPart.Velocity
+			
+			local ps = gun.Position + offs
+			local enb = true
+			
+			spawn(function()
+				while enb and wait() do
+					plr.Character.PrimaryPart.CFrame = CFrame.new(ps)
+					plr.Character.PrimaryPart.Velocity = Vector3.new()
+				end
+			end)
+			
+			wait(.25)
+			enb = false
+			wait()
+			plr.Character.PrimaryPart.Velocity = vl
+			plr.Character.PrimaryPart.CFrame = cap
+			
+			modDid[mod.id] = false
+			modTogEv[mod.id]:Fire()
+			return
+		end,
+	}
 }
 
 log("Loaded GUI")
+local speclColor = Color3.new(1, .8, 0)
 
 ev = game:GetService("RunService").Heartbeat:Connect(function()
 	local isHover = false
@@ -1494,6 +1985,8 @@ ev = game:GetService("RunService").Heartbeat:Connect(function()
 			
 			if modObj then
 				description.Text = modObj.description
+				if modObj.gameSpecific == game.PlaceId then description.TextColor3 = speclColor
+				else description.TextColor3 = Color3.new() end
 				local het = 0.03
 				local lines = modObj.extraLines or 1
 				description.Size = UDim2.new(1, 0, het * lines, 0)
@@ -1547,14 +2040,22 @@ ev = game:GetService("RunService").Stepped:Connect(function()
 		if modToggle[mod.id] and modDid[mod.id] then
 			if mod.tick then
 				local scs, xd = pcall(mod.tick, mod, mod)
-				if not scs then print(scs, xd) end
 			end
 		end
 	end
 end)
 table.insert(events, ev)
 
+-- resize modules' list
+ev = game:GetService("RunService").Stepped:Connect(function()
+	modulesListGrid.CellSize = UDim2.new(0.5, -2, 0, (modulesList.AbsoluteSize.Y * 0.1) - 2)
+	modulesList.CanvasSize = UDim2.new(0, 0, 0, modulesListGrid.AbsoluteContentSize.Y)
+end)
+table.insert(events, ev)
+
+local gsettings = getSettings() or {}
 for imod, mod in pairs(mods) do
+	if mod.gameSpecific and mod.gameSpecific ~= game.PlaceId then continue end
 	mod.settings = mod.settings or createOptions()
 	modToggle[mod.id] = false
 	modEvs[mod.id] = {}
@@ -1562,8 +2063,12 @@ for imod, mod in pairs(mods) do
 	local modul = tempModule:Clone()
 	modul.Name = mod.id
 	modul.title.Text = mod.name
+	if mod.gameSpecific == game.PlaceId or mod.gameBonus == game.PlaceId then modul.title.TextColor3 = speclColor end
 	modul.LayoutOrder = imod
 	modul.Parent = modulesList
+	
+	local sts = findByKey(gsettings, "id", mod.id)
+	if sts then mod.settings = sts.settings end
 	
 	local togg
 	togg = function(isDeath)
@@ -1580,7 +2085,7 @@ for imod, mod in pairs(mods) do
 					if not modToggle[m.id] and table.find(mod.autoEnable, m.id) then modTogEv[m.id]:Fire() end
 				end end
 				local scs, xd = pcall(mod.onEnable, mod, mod)
-				if not scs then print(scs, xd) end
+				print(scs, xd)
 				
 				modDid[mod.id] = true
 			end)
@@ -1602,7 +2107,8 @@ for imod, mod in pairs(mods) do
 			mdl.LayoutOrder = imod
 			mdl.Parent = modlist
 			tweens:Create(mdl, TweenInfo.new(0.2), {
-				TextTransparency = 0
+				TextTransparency = 0,
+				TextStrokeTransparency = 0
 			}):Play()
 		else
 			for _, ed in pairs(modEvs[mod.id]) do ed:Disconnect() end
@@ -1620,7 +2126,8 @@ for imod, mod in pairs(mods) do
 					spawn(function()
 
 						local tws = tweens:Create(mdl, TweenInfo.new(0.2), {
-							TextTransparency = 1
+							TextTransparency = 1,
+							TextStrokeTransparency = 1
 						})
 						tws:Play()
 						tws.Completed:Wait()
