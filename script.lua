@@ -482,9 +482,20 @@ modSettings_choose_optionHitbox.ZIndex = modSettings.ZIndex + 2
 
 local isSettings = false
 local mods = {}
+local wmod = {
+	name = "WurstMod",
+	id = "wmod",
+	settings = {
+		save2cloud = {
+			type = "checkbox",
+			title = "Save to cloud",
+			value = true
+		}
+	}
+}
 
 local function saveSettings()
-
+	if not wmod.settings.save2cloud.value then return end
 	local combined = {}
 	for _, x in pairs(mods) do table.insert(combined, {
 		id = x.id,
@@ -527,6 +538,9 @@ local function buildSettings(mod, obj)
 	title.Text = mod.name
 	title.LayoutOrder = 0
 	title.Parent = setts
+	local ID = Instance.new("StringValue", setts)
+	ID.Name = "ID"
+	ID.Value = mod.id
 	
 	local i = 1
 	for k, v in pairs(obj) do
@@ -701,9 +715,17 @@ local function buildSettings(mod, obj)
 	setts.Parent = modules
 end
 
+local settCachce = {}
 local function destroySettings()
 	isSettings = false
-	if modules:FindFirstChild("settings") then saveSettings(); modules.settings:Destroy() end
+	if modules:FindFirstChild("settings") then spawn(function()
+		local ID = modules.settings:FindFirstChild("ID").Value
+		local modl = findByKey(mods, "id", ID)
+		if modl then
+			if settCachce[ID] == modl.settings then return end
+			saveSettings()
+		end
+	end); modules.settings:Destroy() end
 	modulesList.Visible = true
 	for _, e in pairs(stsEvents) do
 		e:Disconnect()
@@ -2046,14 +2068,35 @@ ev = game:GetService("RunService").Stepped:Connect(function()
 end)
 table.insert(events, ev)
 
+-- wmod settings
+local gsettings = getSettings() or {}
+wmod.settings = gsettings.wmod or wmod.settings
+local wmodS = tempModule:Clone()
+wmodS.Name = "wmodS"
+wmodS.title.Text = "Settings"
+wmodS.Parent = gui
+wmodS.Position = UDim2.new(1, -5, 1, -5)
+wmodS.AnchorPoint = Vector2(1, 1)
+wmodS.btn.MouseButton2Click:Connect(function()
+	buildSettings(wmod, wmod.settings)
+	modulesList.Visible = false
+end)
+
 -- resize modules' list
 ev = game:GetService("RunService").Stepped:Connect(function()
 	modulesListGrid.CellSize = UDim2.new(0.5, -2, 0, (modulesList.AbsoluteSize.Y * 0.1) - 2)
+	if modules:FindFirstChild("settings") then
+		wmodS.Visible = true
+	else
+		wmodS.Visible = modulesList.Visible	
+	end
+	local s =  modulesListGrid.CellSize
+	wmodS.Size = UDim2.new(0.15, -2, 0, s.Y.Offset)
 	modulesList.CanvasSize = UDim2.new(0, 0, 0, modulesListGrid.AbsoluteContentSize.Y)
 end)
 table.insert(events, ev)
 
-local gsettings = getSettings() or {}
+
 for imod, mod in pairs(mods) do
 	if mod.gameSpecific and mod.gameSpecific ~= game.PlaceId then continue end
 	mod.settings = mod.settings or createOptions()
