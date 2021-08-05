@@ -12,16 +12,24 @@ WurstMod is a **mod** for Roblox, inspired by Wurst for Minecraft™
 
 # Loading the Script
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/main/script.lua"))
+loadstring(game:HttpGet("https://www.wurst-mod.tk/dev/latest.lua"))
 ```
 Most games have `loadstring()` **disabled**. If so, visit the URL and copy the script inside.  
 Use the copied script instead of the `loadstring()` script
 ## Different Versions
 <details>
+  <summary>v1.5.0</summary>
+  
+  ```lua
+  loadstring(game:HttpGet("https://www.wurst-mod.tk/main/v1.5.0.lua"))
+  ```
+</details>
+
+<details>
   <summary>v1.4.0</summary>
   
   ```lua
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/2f2d2bb8eb6ff82e2d60e8ce221e5859d2cb9348/script.lua"))
+  loadstring(game:HttpGet("https://www.wurst-mod.tk/main/v1.4.0.lua"))
   ```
 </details>
 
@@ -29,7 +37,7 @@ Use the copied script instead of the `loadstring()` script
   <summary>v1.3.1 - Bugfix</summary>
   
   ```lua
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/1920c229962b8ac8223443a52fa96cfa97b73763/script.lua"))
+  loadstring(game:HttpGet("https://www.wurst-mod.tk/main/v1.3.1.lua"))
   ```
 </details>
 
@@ -37,7 +45,7 @@ Use the copied script instead of the `loadstring()` script
   <summary>v1.3.0</summary>
   
   ```lua
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/6fc5bce93ec40eb39fa9143f91208e27cf8e48ff/script.lua"))
+  loadstring(game:HttpGet("https://www.wurst-mod.tk/main/v1.3.0.lua"))
   ```
 </details>
 
@@ -45,7 +53,7 @@ Use the copied script instead of the `loadstring()` script
   <summary>v1.2.0</summary>
   
   ```lua
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/888de07de19997016a74d0a5261717dd206247b1/script.lua"))
+  loadstring(game:HttpGet("https://www.wurst-mod.tk/main/v1.2.0.lua"))
   ```
 </details>
 
@@ -53,7 +61,7 @@ Use the copied script instead of the `loadstring()` script
   <summary>v1.1.1 - Bugfix</summary>
   
   ```lua
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/8960d22a5e608b2abdc2c5fe0ba017d3efd963a9/script.lua"))
+  loadstring(game:HttpGet("https://www.wurst-mod.tk/main/v1.1.1.lua"))
   ```
 </details>
 
@@ -61,7 +69,7 @@ Use the copied script instead of the `loadstring()` script
   <summary>v1.1.0</summary>
   
   ```lua
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/b0dc3976144fe7f578cb014a31838776ae3fc366/script.lua"))
+  loadstring(game:HttpGet("https://www.wurst-mod.tk/main/v1.1.0.lua"))
   ```
 </details>
 
@@ -69,7 +77,7 @@ Use the copied script instead of the `loadstring()` script
   <summary>v1.0.0</summary>
     
   ```lua
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/WurstMod/Wurst/a85302b2332b8872f01d14d804f1d74a90b8e0a1/script.lua"))
+  loadstring(game:HttpGet("https://www.wurst-mod.tk/main/v1.0.0.lua"))
   ```
 </details>
 
