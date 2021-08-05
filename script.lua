@@ -723,10 +723,14 @@ local function destroySettings()
 		local modl = findByKey(mods, "id", ID)
 		if modl then
 			if settCachce[ID] == modl.settings then return end
-			saveSettings()
+			spawn(function()
+
+				saveSettings()
+			end)
 		end
-	end); modules.settings:Destroy() end
-	modulesList.Visible = true
+		modules.settings:Destroy()
+		modulesList.Visible = true
+	end) end
 	for _, e in pairs(stsEvents) do
 		e:Disconnect()
 	end
@@ -2072,12 +2076,16 @@ table.insert(events, ev)
 local gsettings = getSettings() or {}
 wmod.settings = gsettings.wmod or wmod.settings
 local wmodS = tempModule:Clone()
+wmodS.ZIndex = modulesList.ZIndex
 wmodS.Name = "wmodS"
 wmodS.title.Text = "Settings"
 wmodS.Parent = gui
 wmodS.Position = UDim2.new(1, -5, 1, -5)
-wmodS.AnchorPoint = Vector2(1, 1)
-wmodS.btn.MouseButton2Click:Connect(function()
+wmodS.AnchorPoint = Vector2.new(1, 1)
+spawn(function()
+	wmodS.btn.Visible = false
+end)
+wmodS.btn.Activated:Connect(function()
 	buildSettings(wmod, wmod.settings)
 	modulesList.Visible = false
 end)
@@ -2086,9 +2094,11 @@ end)
 ev = game:GetService("RunService").Stepped:Connect(function()
 	modulesListGrid.CellSize = UDim2.new(0.5, -2, 0, (modulesList.AbsoluteSize.Y * 0.1) - 2)
 	if modules:FindFirstChild("settings") then
-		wmodS.Visible = true
+		wmodS.Visible = false
 	else
-		wmodS.Visible = modulesList.Visible	
+		wmodS.btn.Visible = false
+		wmodS.Visible = modulesList.Visible
+		wmodS.btn.Visible = true
 	end
 	local s =  modulesListGrid.CellSize
 	wmodS.Size = UDim2.new(0.15, -2, 0, s.Y.Offset)
