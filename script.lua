@@ -1944,7 +1944,7 @@ mods = {
 			if gun:IsA("Model") then gun = gun.PrimaryPart end
 			
 			local cap = plr.Character.PrimaryPart.CFrame
-			local offs = plr.Character.PrimaryPart.Position - plr.Character.Head.Position - Vector3.new(0, 1.5, 0)
+			local offs = plr.Character.PrimaryPart.Position - plr.Character.Head.Position
 			local vl = plr.Character.PrimaryPart.Velocity
 			
 			local ps = gun.Position + offs
