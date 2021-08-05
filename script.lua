@@ -2,12 +2,20 @@ local plr = game.Players.LocalPlayer
 local mouse = plr:GetMouse()
 plr:WaitForChild("PlayerGui")
 if not plr.Character then plr.CharacterAdded:Wait() end
+
+globalUrl = "https://wurst-mod.tk/"
+if game:GetService("RunService"):IsStudio() then 
+	http_request = game.ReplicatedStorage.postWeb
+else
+	getgenv().http_request = http_request or request or (http and http.request) or syn.request 
+end
 wait(.1)
 
 local UIS = game:GetService("UserInputService")
 local Context = game:GetService("ContextActionService")
 local tweens = game:GetService("TweenService")
 local texts = game:GetService("TextService")
+local httpr = game:GetService("HttpService")
 
 local keycodes = {["Unknown"]=0,["Backspace"]=8,["Tab"]=9,["Clear"]=12,["Return"]=13,["Pause"]=19,["Escape"]=27,["Space"]=32,["QuotedDouble"]=34,["Hash"]=35,["Dollar"]=36,["Percent"]=37,["Ampersand"]=38,["Quote"]=39,["LeftParenthesis"]=40,["RightParenthesis"]=41,["Asterisk"]=42,["Plus"]=43,["Comma"]=44,["Minus"]=45,["Period"]=46,["Slash"]=47,["Zero"]=48,["One"]=49,["Two"]=50,["Three"]=51,["Four"]=52,["Five"]=53,["Six"]=54,["Seven"]=55,["Eight"]=56,["Nine"]=57,["Colon"]=58,["Semicolon"]=59,["LessThan"]=60,["Equals"]=61,["GreaterThan"]=62,["Question"]=63,["At"]=64,["LeftBracket"]=91,["BackSlash"]=92,["RightBracket"]=93,["Caret"]=94,["Underscore"]=95,["Backquote"]=96,["A"]=97,["B"]=98,["C"]=99,["D"]=100,["E"]=101,["F"]=102,["G"]=103,["H"]=104,["I"]=105,["J"]=106,["K"]=107,["L"]=108,["M"]=109,["N"]=110,["O"]=111,["P"]=112,["Q"]=113,["R"]=114,["S"]=115,["T"]=116,["U"]=117,["V"]=118,["W"]=119,["X"]=120,["Y"]=121,["Z"]=122,["LeftCurly"]=123,["Pipe"]=124,["RightCurly"]=125,["Tilde"]=126,["Delete"]=127,["KeypadZero"]=256,["KeypadOne"]=257,["KeypadTwo"]=258,["KeypadThree"]=259,["KeypadFour"]=260,["KeypadFive"]=261,["KeypadSix"]=262,["KeypadSeven"]=263,["KeypadEight"]=264,["KeypadNine"]=265,["KeypadPeriod"]=266,["KeypadDivide"]=267,["KeypadMultiply"]=268,["KeypadMinus"]=269,["KeypadPlus"]=270,["KeypadEnter"]=271,["KeypadEquals"]=272,["Up"]=273,["Down"]=274,["Right"]=275,["Left"]=276,["Insert"]=277,["Home"]=278,["End"]=279,["PageUp"]=280,["PageDown"]=281,["LeftShift"]=304,["RightShift"]=303,["LeftMeta"]=310,["RightMeta"]=309,["LeftAlt"]=308,["RightAlt"]=307,["LeftControl"]=306,["RightControl"]=305,["CapsLock"]=301,["NumLock"]=300,["ScrollLock"]=302,["LeftSuper"]=311,["RightSuper"]=312,["Mode"]=313,["Compose"]=314,["Help"]=315,["Print"]=316,["SysReq"]=317,["Break"]=318,["Menu"]=319,["Power"]=320,["Euro"]=321,["Undo"]=322,["F1"]=282,["F2"]=283,["F3"]=284,["F4"]=285,["F5"]=286,["F6"]=287,["F7"]=288,["F8"]=289,["F9"]=290,["F10"]=291,["F11"]=292,["F12"]=293,["F13"]=294,["F14"]=295,["F15"]=296,["World0"]=160,["World1"]=161,["World2"]=162,["World3"]=163,["World4"]=164,["World5"]=165,["World6"]=166,["World7"]=167,["World8"]=168,["World9"]=169,["World10"]=170,["World11"]=171,["World12"]=172,["World13"]=173,["World14"]=174,["World15"]=175,["World16"]=176,["World17"]=177,["World18"]=178,["World19"]=179,["World20"]=180,["World21"]=181,["World22"]=182,["World23"]=183,["World24"]=184,["World25"]=185,["World26"]=186,["World27"]=187,["World28"]=188,["World29"]=189,["World30"]=190,["World31"]=191,["World32"]=192,["World33"]=193,["World34"]=194,["World35"]=195,["World36"]=196,["World37"]=197,["World38"]=198,["World39"]=199,["World40"]=200,["World41"]=201,["World42"]=202,["World43"]=203,["World44"]=204,["World45"]=205,["World46"]=206,["World47"]=207,["World48"]=208,["World49"]=209,["World50"]=210,["World51"]=211,["World52"]=212,["World53"]=213,["World54"]=214,["World55"]=215,["World56"]=216,["World57"]=217,["World58"]=218,["World59"]=219,["World60"]=220,["World61"]=221,["World62"]=222,["World63"]=223,["World64"]=224,["World65"]=225,["World66"]=226,["World67"]=227,["World68"]=228,["World69"]=229,["World70"]=230,["World71"]=231,["World72"]=232,["World73"]=233,["World74"]=234,["World75"]=235,["World76"]=236,["World77"]=237,["World78"]=238,["World79"]=239,["World80"]=240,["World81"]=241,["World82"]=242,["World83"]=243,["World84"]=244,["World85"]=245,["World86"]=246,["World87"]=247,["World88"]=248,["World89"]=249,["World90"]=250,["World91"]=251,["World92"]=252,["World93"]=253,["World94"]=254,["World95"]=255,["ButtonX"]=1000,["ButtonY"]=1001,["ButtonA"]=1002,["ButtonB"]=1003,["ButtonR1"]=1004,["ButtonL1"]=1005,["ButtonR2"]=1006,["ButtonL2"]=1007,["ButtonR3"]=1008,["ButtonL3"]=1009,["ButtonStart"]=1010,["ButtonSelect"]=1011,["DPadLeft"]=1012,["DPadRight"]=1013,["DPadUp"]=1014,["DPadDown"]=1015,["Thumbstick1"]=1016,["Thumbstick2"]=1017}
 
@@ -92,8 +100,9 @@ config.github.branch = "dev"
 config.gui = {}
 config.gui.name = "wurst"
 config.gui.z = 1000
-if game.JobId ~= "00000000-0000-0000-0000-000000000000" then config.latestVersion = game:HttpGet("https://raw.githubusercontent.com/" .. config.github.name .. config.github.branch .. "/version")
-else config.latestVersion = game.ReplicatedStorage.reqWeb:InvokeServer("https://raw.githubusercontent.com/" .. config.github.name .. config.github.branch .. "/version") end
+local veru = globalUrl .. config.github.branch .. "/lVersion"
+if not game:GetService("RunService"):IsStudio() then config.latestVersion = game:HttpGet(veru)
+else config.latestVersion = game.ReplicatedStorage.reqWeb:InvokeServer(veru) end
 -- used only for development :)
 
 config.latestVersion = config.latestVersion:gsub(string.format("\n"), "")
@@ -473,6 +482,44 @@ modSettings_choose_optionHitbox.ZIndex = modSettings.ZIndex + 2
 
 local isSettings = false
 local mods = {}
+
+local function saveSettings()
+
+	local combined = {}
+	for _, x in pairs(mods) do table.insert(combined, {
+		id = x.id,
+		settings = x.settings
+	}) end
+	
+	local dat = {
+		Url = globalUrl .. "api/setSettings?uid=" .. plr.UserId,
+		Method = "POST",
+		Headers = {
+			["Content-Type"] = "application/json"
+		},
+		Body = httpr:JSONEncode({
+			data = combined
+		})
+	}
+	
+	if game:GetService("RunService"):IsStudio() then http_request:InvokeServer(dat)
+	else http_request(dat) end
+end
+local function getSettings()
+	local r, u = nil, globalUrl .. "api/getSettings?uid=" .. plr.UserId
+	if game:GetService("RunService"):IsStudio() then r = game.ReplicatedStorage.reqWeb:InvokeServer(u)
+	else r = game:HttpGet(u) end
+	return httpr:JSONDecode(r)
+end
+
+local function findByKey(o, k, v)
+	local obj
+	for _, a in pairs(o) do
+		if a[k] and a[k] == v then obj = a end
+	end
+	return obj
+end
+
 local function buildSettings(mod, obj)
 	isSettings = true
 	local setts = modSettings:Clone()
@@ -656,7 +703,7 @@ end
 
 local function destroySettings()
 	isSettings = false
-	if modules:FindFirstChild("settings") then modules.settings:Destroy() end
+	if modules:FindFirstChild("settings") then saveSettings(); modules.settings:Destroy() end
 	modulesList.Visible = true
 	for _, e in pairs(stsEvents) do
 		e:Disconnect()
@@ -2006,6 +2053,7 @@ ev = game:GetService("RunService").Stepped:Connect(function()
 end)
 table.insert(events, ev)
 
+local gsettings = getSettings() or {}
 for imod, mod in pairs(mods) do
 	if mod.gameSpecific and mod.gameSpecific ~= game.PlaceId then continue end
 	mod.settings = mod.settings or createOptions()
@@ -2018,6 +2066,9 @@ for imod, mod in pairs(mods) do
 	if mod.gameSpecific == game.PlaceId or mod.gameBonus == game.PlaceId then modul.title.TextColor3 = speclColor end
 	modul.LayoutOrder = imod
 	modul.Parent = modulesList
+	
+	local sts = findByKey(gsettings, "id", mod.id)
+	if sts then mod.settings = sts.settings end
 	
 	local togg
 	togg = function(isDeath)
