@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.6.0 [10/08/2021]
+### Added
+- New Modules
+  * Debug
+### Changed
+- Bugfix in InfiniteJump
+### Coming Soon
+- Game-Specific Modules
+  * PhantomForces
+
 ## v1.5.0 [05/08/2021]
 ### Added
 - New Modules
