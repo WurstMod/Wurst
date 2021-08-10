@@ -18,6 +18,14 @@ Most games have `loadstring()` **disabled**. If so, visit the URL and copy the s
 Use the copied script instead of the `loadstring()` script
 ## Different Versions
 <details>
+  <summary>v1.6.0</summary>
+  
+  ```lua
+  loadstring(game:HttpGet("https://www.wurst-mod.tk/dev/v1.6.0.lua"))
+  ```
+</details>
+
+<details>
   <summary>v1.5.0</summary>
   
   ```lua
