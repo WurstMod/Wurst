@@ -93,7 +93,7 @@ local function findPlr(str, multiple)
 end
 
 local config = {}
-config.version = "v1.5.0"
+config.version = "v1.6.0"
 config.github = {}
 config.github.name = "WurstMod/Wurst/"
 config.github.branch = "dev"
@@ -724,7 +724,6 @@ local function destroySettings()
 		if modl then
 			if settCachce[ID] == modl.settings then return end
 			spawn(function()
-
 				saveSettings()
 			end)
 		end
@@ -1739,14 +1738,14 @@ mods = {
 		settings = createOptions(),
 		onEnable = function(mod)
 			mod.ev = UIS.InputBegan:Connect(function(k, c)
-				print("hello")
 				if not charCheck(plr.Character) then return end
 				if c then return end
 				if k.KeyCode == Enum.KeyCode.Space then
 					local st = plr.Character.Humanoid:GetState()
 					if st == Enum.HumanoidStateType.Jumping or st == Enum.HumanoidStateType.Freefall then
 						plr.Character.Humanoid.UseJumpPower = true
-						plr.Character.PrimaryPart.Velocity = Vector3.new(0, plr.Character.Humanoid.JumpPower, 0) 
+						local vl = plr.Character.PrimaryPart.Velocity
+						plr.Character.PrimaryPart.Velocity = Vector3.new(vl.X, plr.Character.Humanoid.JumpPower, vl.Z) 
 					end
 				end
 			end)
@@ -1917,6 +1916,66 @@ mods = {
 			workspace.CurrentCamera.CameraSubject = mod.chr.Humanoid
 			plr.Character = mod.chr
 			mod.nchr:Destroy()
+		end,
+	},
+	{
+		name = "Debug",
+		id = "debug",
+		description = "Adds some debug parameters to the corner of your screen",
+		settings = createOptions({
+			fps = {
+				type = "checkbox",
+				title = "Show FPS",
+				value = true
+			},
+			coordinates = {
+				type = "checkbox",
+				title = "Coordinates",
+				value = true
+			}
+		}),
+		onEnable = function(mod)
+			local dbg = Instance.new("TextLabel")
+			dbg.Name = "debug"
+			dbg.AnchorPoint = Vector2.new(1, 0)
+			dbg.Position = UDim2.new(1, 0, 0, 0)
+			dbg.Size = UDim2.new(0.4, 0, 0.3, 0)
+			dbg.BackgroundTransparency = 1
+			dbg.TextXAlignment = Enum.TextXAlignment.Right
+			dbg.TextYAlignment = Enum.TextYAlignment.Top
+			dbg.TextStrokeColor3 = Color3.new(1, 1, 1)
+			dbg.TextStrokeTransparency = 0
+			dbg.Parent = gui
+			mod.debug = dbg
+		end,
+		tick = function(mod)
+			local dbg = mod.debug
+			dbg.TextSize = dbg.AbsoluteSize.Y * 0.1042
+			
+			local pos = {}
+			if charCheck(plr.Character) then
+				local ps = plr.Character.PrimaryPart.Position
+				pos = {
+					X = math.floor(ps.X),
+					Y = math.floor(ps.Y),
+					Z = math.floor(ps.Z)
+				}
+			else pos = {
+				X = "-",
+				Y = "-",
+				Z = "-"
+			}
+			end
+			
+			local classes = {}
+			if mod.settings.fps.value then table.insert(classes, string.format("FPS: %s", workspace:GetRealPhysicsFPS())) end
+			if mod.settings.coordinates.value then table.insert(classes, string.format("Position: %s, %s, %s", pos.X, pos.Y, pos.Z)) end
+			
+			dbg.Text = table.concat(classes, "\n")
+		end,
+		onDisable = function(mod)
+			mod.debug:Destroy()
+			mod.debug = nil
 		end,
 	},
 	{
