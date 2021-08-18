@@ -6,9 +6,14 @@
   * Debug
 ### Changed
 - Bugfix in InfiniteJump
+- Fixed cloud saving... I think
 ### Coming Soon
 - Game-Specific Modules
   * PhantomForces
+  * TwitchIntegration
+  * YoutubeIntegration
+  * CameraNoclip
+  * WurstChat
 
 ## v1.5.0 [05/08/2021]
 ### Added
