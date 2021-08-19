@@ -487,7 +487,7 @@ local liveYTChat = Instance.new("Frame", gui)
 liveYTChat.BackgroundTransparency = 1
 liveYTChat.Name = "ytchat"
 liveYTChat.Size = UDim2.new(0.35, 0, 1, 0)
-liveYTChat.ZIndex = gui.DisplayOrder + 100
+liveYTChat.ZIndex = config.gui.z + #gui:GetDescendants()
 
 local liveYTChat_list = Instance.new("UIListLayout", liveYTChat)
 liveYTChat_list.Name = "list"
@@ -1014,7 +1014,7 @@ mods = {
 		name = "NoClip",
 		id = "nclp",
 		extraLines = 3,
-		description = "Makes your character no-clip.<br/><b>Buggy on terrain!</b><br/><b>Turn off before sitting.</b>",
+		description = "Makes your character no-clip.\n<b>Buggy on terrain!</b>\n<b>Turn off before sitting.</b>",
 		settings = createOptions(),
 		onEnable = function() end,
 		onDisable = function() end,
@@ -2038,7 +2038,7 @@ mods = {
 	{
 		name = "YoutubeLiveChat",
 		id = "ytlivechat",
-		description = "Shows a live chat of a video",
+		description = "Shows a live chat of a YouTube video",
 		settings = createOptions({
 			id = {
 				type = "string",
@@ -2133,8 +2133,8 @@ mods = {
 						m.LayoutOrder = -m.LayoutOrder
 					end
 						
-					local siz = 20
-					local sz = texts:GetTextSize(m.Text, siz, m.Font, Vector2.new(m.AbsoluteSize.X, math.huge))
+					local siz = 0.02907915993538 -- 18
+					local sz = texts:GetTextSize(m.Text, siz * workspace.CurrentCamera.ViewportSize.Y, m.Font, Vector2.new(m.AbsoluteSize.X, math.huge))
 					m.Size = UDim2.new(m.Size.X, UDim.new(sz.Y / m.Parent.AbsoluteSize.Y, 0))
 					i += 1
 				end
@@ -2229,6 +2229,7 @@ local defColor = description.TextColor3
 
 ev = game:GetService("RunService").Heartbeat:Connect(function()
 	local isHover = false
+	local het = 0.035
 	for _, mod in pairs(modulesList:GetChildren()) do
 		if modulesList.Visible and mod:IsA("Frame") and (mouse.X >= mod.AbsolutePosition.X and mouse.X < mod.AbsolutePosition.X + mod.AbsoluteSize.X) and (mouse.Y >= mod.AbsolutePosition.Y and mouse.y < mod.AbsolutePosition.Y + mod.AbsoluteSize.Y) then
 			isHover = true
@@ -2241,28 +2242,25 @@ ev = game:GetService("RunService").Heartbeat:Connect(function()
 				description.Text = modObj.description
 				if modObj.gameSpecific == game.PlaceId then description.TextColor3 = speclColor
 				else description.TextColor3 = defColor end
-				local het = 0.03
-				local lines = modObj.extraLines or 1
-				description.Size = UDim2.new(1, 0, het * lines, 0)
-				description.AnchorPoint = Vector2.new(0, 1)
+				local onLine = texts:GetTextSize("", 14, description.Font, Vector2.new(math.huge, math.huge)).Y
+				local lines = texts:GetTextSize(description.Text, 14, description.Font, Vector2.new(math.huge, math.huge))
+				description.Size = UDim2.new((lines.X / workspace.CurrentCamera.ViewportSize.X) * 2, 0, het * (lines.Y / onLine), 0)
 			end 
 		end
 	end
 	
 	if (mouse.X >= titleText.AbsolutePosition.X and mouse.X < titleText.AbsolutePosition.X + titleText.AbsoluteSize.X) and (mouse.Y >= titleText.AbsolutePosition.Y and mouse.y < titleText.AbsolutePosition.Y + titleText.AbsoluteSize.Y) then
-		local lines = 1
 		local txt = ""
 		if config.version == config.latestVersion then
 			txt = string.format("You are on the latest version (%s)!", config.latestVersion)
 		else
 			txt = string.format("Outdated!\nYou are on version %s while the\nlatest version is %s!", config.version, config.latestVersion)
-			lines = 3
 		end
 		
-		local het = 0.03
-		description.Size = UDim2.new(1, 0, het * lines, 0)
-		description.AnchorPoint = Vector2.new()
 		description.Text = txt
+		local onLine = texts:GetTextSize("", 14, description.Font, Vector2.new(math.huge, math.huge)).Y
+		local lines = texts:GetTextSize(description.Text, 14, description.Font, Vector2.new(math.huge, math.huge))
+		description.Size = UDim2.new((lines.X / workspace.CurrentCamera.ViewportSize.X) * 2, 0, het * (lines.Y / onLine), 0)
 		
 		isHover = true
 	end
