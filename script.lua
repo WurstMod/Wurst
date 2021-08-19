@@ -2319,7 +2319,7 @@ wmodS.btn.Activated:Connect(function()
 end)
 
 -- resize modules' list
-local mainY = modulesListGrid.CellSize.Y.Scale.Scale
+local mainY = modulesListGrid.CellSize.Y.Scale
 ev = game:GetService("RunService").Stepped:Connect(function()
 	modulesListGrid.CellSize = UDim2.new(0.5, -2, 0, (modulesList.AbsoluteSize.Y * mainY) - 2)
 	if modules:FindFirstChild("settings") then
