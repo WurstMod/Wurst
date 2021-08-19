@@ -2225,6 +2225,7 @@ mods = {
 
 log("Loaded GUI")
 local speclColor = Color3.new(1, .8, 0)
+local defColor = description.TextColor3
 
 ev = game:GetService("RunService").Heartbeat:Connect(function()
 	local isHover = false
@@ -2239,7 +2240,7 @@ ev = game:GetService("RunService").Heartbeat:Connect(function()
 			if modObj then
 				description.Text = modObj.description
 				if modObj.gameSpecific == game.PlaceId then description.TextColor3 = speclColor
-				else description.TextColor3 = Color3.new() end
+				else description.TextColor3 = defColor end
 				local het = 0.03
 				local lines = modObj.extraLines or 1
 				description.Size = UDim2.new(1, 0, het * lines, 0)
@@ -2318,7 +2319,7 @@ wmodS.btn.Activated:Connect(function()
 end)
 
 -- resize modules' list
-local mainY = modulesList.Size.Y.Scale
+local mainY = modulesListGrid.CellSize.Y.Scale.Scale
 ev = game:GetService("RunService").Stepped:Connect(function()
 	modulesListGrid.CellSize = UDim2.new(0.5, -2, 0, (modulesList.AbsoluteSize.Y * mainY) - 2)
 	if modules:FindFirstChild("settings") then
@@ -2354,6 +2355,8 @@ for imod, mod in pairs(mods) do
 			if mod.settings[x] and d.value ~= nil then mod.settings[x].value = d.value end
 		end
 	end
+	
+	local offBtn = modul.BackgroundColor3
 	
 	local togg
 	togg = function(isDeath)
@@ -2397,7 +2400,7 @@ for imod, mod in pairs(mods) do
 		else
 			for _, ed in pairs(modEvs[mod.id]) do ed:Disconnect() end
 			tweens:Create(modul, TweenInfo.new(0.2), {
-				BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+				BackgroundColor3 = offBtn
 			}):Play()
 
 			spawn(function()
