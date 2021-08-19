@@ -93,6 +93,18 @@ Use the copied script instead of the `loadstring()` script
   ```
 </details>
 
+# Themes
+
+WurstMod now supports themes! Themes can be applied by adding a `?theme=X` parameter to the URL. Here's the list of all the themes:
+
+- basic
+
+Example:
+
+```lua
+loadstring(game:HttpGet("https://www.wurst-mod.tk/dev/latest.lua?theme=basic"))
+```
+
 # Controls
 
 - RControl - toggle gui
@@ -126,6 +138,6 @@ Use the copied script instead of the `loadstring()` script
   You can also add a `?key=X` parameter to the URL. We recommend viewing all [Enum.KeyCode](https://developer.roblox.com/en-us/api-reference/enum/KeyCode) values. Example:
     
   ```lua
-  loadstring(game:HttpGet("https://www.wurst-mod.tk/dev/latest.lua?key=YOUR_KEY_HERE"))
+  loadstring(game:HttpGet("https://www.wurst-mod.tk/dev/latest.lua?key=RightShift"))
   ```
 </details>

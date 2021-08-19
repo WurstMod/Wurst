@@ -50,7 +50,7 @@ local function createOptions(obj, fc)
 	end
 	
 	if fc then fc(o) end
-
+	
 	return o
 end
 local function findPlr(str, multiple)
@@ -128,11 +128,12 @@ gui.IgnoreGuiInset = true
 gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 
+--> THEME_START <--
 local title = Instance.new("Frame", gui)
 title.Name = "title"
 title.BackgroundTransparency = 1
 title.Size = UDim2.new(0.43, 0, 0.125, 0)
-title.ZIndex = config.gui.z + #gui:GetDescendants()
+title.ZIndex = config.gui.z + #gui.Parent:GetDescendants()
 
 local modal = Instance.new("TextButton", gui)
 modal.Name = "modal"
@@ -479,6 +480,35 @@ modSettings_choose_optionHitbox.Size = UDim2.new(1, 0, 1, 0)
 modSettings_choose_optionHitbox.Image = ""
 modSettings_choose_optionHitbox.HoverImage = ""
 modSettings_choose_optionHitbox.ZIndex = modSettings.ZIndex + 2
+--> THEME_END <--
+
+--> THEME_YTB_START <--
+local liveYTChat = Instance.new("Frame", gui)
+liveYTChat.BackgroundTransparency = 1
+liveYTChat.Name = "ytchat"
+liveYTChat.Size = UDim2.new(0.35, 0, 1, 0)
+liveYTChat.ZIndex = gui.DisplayOrder + 100
+
+local liveYTChat_list = Instance.new("UIListLayout", liveYTChat)
+liveYTChat_list.Name = "list"
+liveYTChat_list.FillDirection = Enum.FillDirection.Vertical
+liveYTChat_list.HorizontalAlignment = Enum.HorizontalAlignment.Left
+liveYTChat_list.SortOrder = Enum.SortOrder.LayoutOrder
+liveYTChat_list.VerticalAlignment = Enum.VerticalAlignment.Bottom
+
+local liveYTChat_msg = Instance.new("TextLabel")
+liveYTChat_msg.BackgroundTransparency = 1
+liveYTChat_msg.Size = UDim2.new(1, 0, 0.1, 0)
+liveYTChat_msg.Font = Enum.Font.Nunito
+liveYTChat_msg.RichText = true
+liveYTChat_msg.TextColor3 = Color3.new(1, 1, 1)
+liveYTChat_msg.TextScaled = true
+liveYTChat_msg.TextStrokeColor3 = Color3.new(1, 1, 1)
+liveYTChat_msg.TextStrokeTransparency = 1
+liveYTChat_msg.TextXAlignment = Enum.TextXAlignment.Left
+liveYTChat_msg.TextYAlignment = Enum.TextYAlignment.Bottom
+liveYTChat_msg.ZIndex = liveYTChat.ZIndex + 1
+--> THEME_YTB_END <--
 
 local isSettings = false
 local mods = {}
@@ -501,7 +531,6 @@ local function saveSettings()
 		id = x.id,
 		settings = x.settings
 	}) end
-	
 	local dat = {
 		Url = globalUrl .. "api/setSettings?uid=" .. plr.UserId,
 		Method = "POST",
@@ -719,14 +748,9 @@ local settCachce = {}
 local function destroySettings()
 	isSettings = false
 	if modules:FindFirstChild("settings") then spawn(function()
-		local ID = modules.settings:FindFirstChild("ID").Value
-		local modl = findByKey(mods, "id", ID)
-		if modl then
-			if settCachce[ID] == modl.settings then return end
-			spawn(function()
-				saveSettings()
-			end)
-		end
+		spawn(function()
+			saveSettings()
+		end)
 		modules.settings:Destroy()
 		modulesList.Visible = true
 	end) end
@@ -1978,6 +2002,150 @@ mods = {
 			mod.debug = nil
 		end,
 	},
+	--{
+	--	name = "CameraNoClip",
+	--	id = "camnoclip",
+	--	description = "Allows you to clip your camera through... stuff",
+	--	settings = createOptions(),
+	--	data = {
+	--		camX = 0,
+	--		camY = 0,
+	--		zoom = 5
+	--	},
+	--	onEnable = function(mod)
+	--		local offs = plr.Character.Head.CFrame:ToObjectSpace(workspace.CurrentCamera.CFrame)
+	--		local sub = workspace.CurrentCamera.CameraSubject
+	--		local typ = workspace.CurrentCamera.CameraType
+	--		mod.offset = offs
+	--		mod.typ = typ
+	--		mod.sub = sub
+	--		workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+
+	--		mod.data.zoom = 5
+	--		mod.data.camX = 0
+	--		mod.data.camY = 0
+	--	end,
+	--	tick = function(mod)
+	--		local yoffs = plr.Character.Head.Position.Y - plr.Character.PrimaryPart.Position.Y
+	--		local cf = CFrame.new(plr.Character.PrimaryPart.CFrame:ToWorldSpace( CFrame.new( Vector3.new(mod.data.zoom, yoffs, 0) ) ).p , plr.Character.PrimaryPart.CFrame:ToWorldSpace(CFrame.new(Vector3.new(0, yoffs, 0))).p)
+	--		workspace.CurrentCamera.CFrame = CFrame.new(cf.p)
+	--	end,
+	--	onDisable = function(mod)
+	--		workspace.CurrentCamera.CameraType = mod.typ
+	--		workspace.CurrentCamera.CameraSubject = mod.SUB
+	--	end,
+	--},
+	{
+		name = "YoutubeLiveChat",
+		id = "ytlivechat",
+		description = "Shows a live chat of a video",
+		settings = createOptions({
+			id = {
+				type = "string",
+				title = "ID of a Youtube Video",
+				value = ""
+			},
+			side = {
+				type = "choose",
+				title = "Side",
+				value = 1,
+				options = {
+					"Left",
+					"Right"
+				}
+			},
+			layout = {
+				type = "choose",
+				title = "Layout",
+				value = 2,
+				options = {
+					"Top",
+					"Bottom"
+				}
+			}
+		}),
+		jsonCache = {},
+		onEnable = function(mod)
+			if not mod.settings.id.value or mod.settings.id.value == "" then
+				mod.jsonCache = {}
+				modDid[mod.id] = false
+				modTogEv[mod.id]:Fire()
+				return				
+			end
+			
+			spawn(function()
+				while wait(.25) do
+					if not modToggle[mod.id] then return end
+					
+					local datt
+					local dat = {
+						Url = globalUrl .. "api/ytchat?id=" .. mod.settings.id.value,
+						Method = "GET"
+					}
+					if game:GetService("RunService"):IsStudio() then datt = http_request:InvokeServer(dat)
+					else datt = http_request(dat) end
+
+					if datt.Status == 404 then
+						mod.jsonCache = {}
+						modDid[mod.id] = false
+						modTogEv[mod.id]:Fire()
+						return
+					else
+						local llua = httpr:JSONDecode(datt.Body)
+						local ids = {}
+						for _, d in pairs(mod.jsonCache) do table.insert(ids, d.id) end
+
+						spawn(function()
+							if #ids == 0 then return end
+							for j, m in pairs(llua) do
+								if not table.find(ids, m.id) then
+									if not m.pinned then
+										local msg = liveYTChat_msg:Clone()
+										msg.Name = m.id
+										msg.Text = string.format("<b>%s</b> %s", m.author.name, m.text)
+										msg.LayoutOrder = tick()
+										msg.Parent = liveYTChat
+									end
+								end
+							end
+						end)
+						mod.jsonCache = llua
+					end
+				end
+			end)
+		end,
+		tick = function(mod)
+			if mod.settings.side.value == 2 then
+				liveYTChat.AnchorPoint = Vector2.new(1, 0)
+				liveYTChat.Position = UDim2.new(1, 0, 0, 0)
+			else
+				liveYTChat.AnchorPoint = Vector2.new(0, 0)
+				liveYTChat.Position = UDim2.new(0, 0, 0, 0)
+			end
+			
+			liveYTChat_list.VerticalAlignment = Enum.VerticalAlignment[mod.settings.layout.options[mod.settings.layout.value]]
+			
+			local i = 1
+			for _, m in pairs(liveYTChat:GetChildren()) do
+				if m:IsA("TextLabel") then
+					m.TextXAlignment = Enum.TextXAlignment[mod.settings.side.options[mod.settings.side.value]]
+					if (m.LayoutOrder > 0 and mod.settings.layout.value == 1) or (m.LayoutOrder < 0 and mod.settings.layout.value == 2) then
+						m.LayoutOrder = -m.LayoutOrder
+					end
+						
+					local siz = 20
+					local sz = texts:GetTextSize(m.Text, siz, m.Font, Vector2.new(m.AbsoluteSize.X, math.huge))
+					m.Size = UDim2.new(m.Size.X, UDim.new(sz.Y / m.Parent.AbsoluteSize.Y, 0))
+					i += 1
+				end
+			end
+		end,
+		onDisable = function(mod)
+			for _, xd in pairs(liveYTChat:GetChildren()) do
+				if xd:IsA("TextLabel") then xd:Destroy() end
+			end
+		end,
+	},
 	{
 		name = "RoleNotifications",
 		id = "mm2_rlnotif",
@@ -2180,7 +2348,11 @@ for imod, mod in pairs(mods) do
 	modul.Parent = modulesList
 	
 	local sts = findByKey(gsettings, "id", mod.id)
-	if sts then mod.settings = sts.settings end
+	if sts then
+		for x, d in pairs(sts.settings) do
+			if mod.settings[x] and d.value ~= nil then mod.settings[x].value = d.value end
+		end
+	end
 	
 	local togg
 	togg = function(isDeath)
@@ -2195,9 +2367,8 @@ for imod, mod in pairs(mods) do
 			spawn(function()
 				if mod.autoEnable then for _, m in pairs(mods) do
 					if not modToggle[m.id] and table.find(mod.autoEnable, m.id) then modTogEv[m.id]:Fire() end
-				end end
+					end end
 				local scs, xd = pcall(mod.onEnable, mod, mod)
-				print(scs, xd)
 				
 				modDid[mod.id] = true
 			end)

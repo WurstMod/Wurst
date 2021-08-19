@@ -4,8 +4,10 @@
 
 ### Added
 
+- Themes (more in README.md)
 - New Modules
   - Debug
+  - YoutubeIntegration
 
 ### Changed
 
@@ -18,7 +20,6 @@
   - PhantomForces
 - New Modules
   - TwitchIntegration
-  - YoutubeIntegration
   - WurstChat
 
 ### Maybe
