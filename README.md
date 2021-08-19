@@ -4,19 +4,23 @@
     <img src="https://raw.githubusercontent.com/WurstMod/Wurst/dev/wurstdev.png" />
 </div>
 
-----
+---
 
 WurstMod is a **mod** for Roblox, inspired by Wurst for Minecraft™
 
 **Do you have any ideas/reports etc.? Contact us [here](https://github.com/WurstMod/Wurst/issues/new)**
 
 # Loading the Script
+
 ```lua
 loadstring(game:HttpGet("https://www.wurst-mod.tk/dev/latest.lua"))
 ```
+
 Most games have `loadstring()` **disabled**. If so, visit the URL and copy the script inside.  
 Use the copied script instead of the `loadstring()` script
+
 ## Different Versions
+
 <details>
   <summary>v1.6.0</summary>
   
@@ -90,14 +94,20 @@ Use the copied script instead of the `loadstring()` script
 </details>
 
 # Controls
+
 - RControl - toggle gui
+
 #### Module
+
 - LeftClick - toggle module
 - RightClick - open settings menu
+
 #### Module Settings
+
 - RControl - close settings menu
 
 # Can't use Right Control?
+
 <details>
   <summary>AutoHotkey</summary>
   
@@ -108,4 +118,14 @@ Use the copied script instead of the `loadstring()` script
   <summary>On-screen Keyboard</summary>
   
   You can also use an on-screen keyboard, which allows you to press keys just by clicking on them.
+</details>
+
+<details>
+  <summary>Modyfing the Script</summary>
+  
+  You can also add a `?key=X` parameter to the URL. We recommend viewing all [Enum.KeyCode](https://developer.roblox.com/en-us/api-reference/enum/KeyCode) values. Example:
+    
+  ```lua
+  loadstring(game:HttpGet("https://www.wurst-mod.tk/dev/latest.lua?key=YOUR_KEY_HERE"))
+  ```
 </details>

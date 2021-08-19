@@ -19,8 +19,12 @@
 - New Modules
   - TwitchIntegration
   - YoutubeIntegration
-  - CameraNoclip
   - WurstChat
+
+### Maybe
+
+- New Modules
+  - CameraNoclip
 
 ## v1.5.0 [05/08/2021]
 
