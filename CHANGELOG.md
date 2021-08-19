@@ -5,6 +5,7 @@
 ### Added
 
 - Themes (more in README.md)
+- Community Modules (more in community-modules.lua)
 - New Modules
   - Debug
   - YoutubeIntegration

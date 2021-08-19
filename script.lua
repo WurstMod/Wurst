@@ -943,8 +943,11 @@ mods = {
 			mod.data.freecamCamTyp = workspace.CurrentCamera.CameraType
 			mod.data.freecamCamCF = workspace.CurrentCamera.CFrame
 
-			mod.data.camX = -math.deg(mod.data.freecamOrt.X)
-			mod.data.camY = -math.deg(mod.data.freecamOrt.Y)
+			print(math.deg(mod.data.freecamOrt.X))
+			print(math.deg(mod.data.freecamOrt.Y))
+
+			mod.data.camX = math.deg(mod.data.freecamOrt.Y)
+			mod.data.camY = math.deg(mod.data.freecamOrt.X)
 		end,
 		onDisable = function(mod)
 			for g, v in pairs(mod.data.freecamGUIs) do
@@ -1129,8 +1132,7 @@ mods = {
 		onEnable = function(mod)
 			local splr = findPlr(mod.settings.plr.value, false)
 			if not splr then
-				modDid[mod.id] = false
-				modTogEv[mod.id]:Fire()
+				mod:disable()
 				return
 			end
 		end,
@@ -1139,16 +1141,14 @@ mods = {
 			if not charCheck(plr.Character) then return end
 			local splr = findPlr(mod.settings.plr.value, false)
 			if not splr or not charCheck(splr.Character) then
-				modDid[mod.id] = false
-				modTogEv[mod.id]:Fire()
+				mod:disable()
 				return
 			end
 
 			plr.Character.PrimaryPart.CFrame = splr.Character.PrimaryPart.CFrame
 
 			if mod.settings.disb.value then
-				modDid[mod.id] = false
-				modTogEv[mod.id]:Fire()
+				mod:disable()
 				return
 			end
 		end,
@@ -1282,8 +1282,7 @@ mods = {
 			
 			local splr = findPlr(mod.settings.plr.value, false)
 			if not splr then
-				modDid[mod.id] = false
-				modTogEv[mod.id]:Fire()
+				mod:disable()
 				return
 			end
 		end,
@@ -1813,8 +1812,7 @@ mods = {
 		onEnable = function(mod)
 			local splr = findPlr(mod.settings.plr.value, false)
 			if not splr or not splr.Character or not splr.Character.PrimaryPart then
-				modDid[mod.id] = false
-				modTogEv[mod.id]:Fire()
+				mod:disable()
 				return
 			end
 			
@@ -1884,8 +1882,7 @@ mods = {
 		onEnable = function(mod)
 			local ky = mod.settings.keybind.value
 			if ky == 0 then
-				modDid[mod.id] = false
-				modTogEv[mod.id]:Fire()
+				mod:disable()
 				return
 			end
 			
@@ -2068,8 +2065,7 @@ mods = {
 		onEnable = function(mod)
 			if not mod.settings.id.value or mod.settings.id.value == "" then
 				mod.jsonCache = {}
-				modDid[mod.id] = false
-				modTogEv[mod.id]:Fire()
+				mod:disable()
 				return				
 			end
 			
@@ -2087,8 +2083,7 @@ mods = {
 
 					if datt.Status == 404 then
 						mod.jsonCache = {}
-						modDid[mod.id] = false
-						modTogEv[mod.id]:Fire()
+						mod:disable()
 						return
 					else
 						local llua = httpr:JSONDecode(datt.Body)
@@ -2189,8 +2184,7 @@ mods = {
 			local gun = workspace:FindFirstChild(mod.settings.gun.value)
 			
 			if not gun then
-				modDid[mod.id] = false
-				modTogEv[mod.id]:Fire()
+				mod:disable()
 				return
 			end
 			
@@ -2215,12 +2209,14 @@ mods = {
 			wait()
 			plr.Character.PrimaryPart.Velocity = vl
 			plr.Character.PrimaryPart.CFrame = cap
-			
-			modDid[mod.id] = false
-			modTogEv[mod.id]:Fire()
+
+			mod:disable()
 			return
 		end,
-	}
+	},
+
+	--> COMMUNITY_MODULES <--
+	--> COMMUNITY_MODULES_END <--
 }
 
 log("Loaded GUI")
@@ -2433,6 +2429,14 @@ for imod, mod in pairs(mods) do
 		end
 	end)
 	table.insert(events, ev)
+
+	mod.disable = function()
+		if modToggle[mod.id] then
+			-- just to make sure
+			modDid[mod.id] = false
+			modTogEv[mod.id]:Fire()
+		end
+	end
 	
 	modul.btn.Activated:Connect(togg)
 	modTogEv[mod.id].Event:Connect(togg)

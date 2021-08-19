@@ -3,7 +3,6 @@ local pogTemplate = {
     name = "MyPogModule", -- The name of the module which will display in the list
     id = "mypogmod", -- The unique module ID (WARNING: only one module can have an ID. If we find out that your module uses an ID that already exists, we'll change it)
     description = "This is a module, and it's very pog!!!", -- The text that appears when you hover over the module
-    isCommunityModule = true, -- required
     autoEnable = { "fly" }, -- Automatically enables all mods in this array (by ID)
     deathDisable = true, -- Disables the module once the character dies
     gameSpecific = 123456789, -- Optional | This module will only appear when in a specific game
@@ -60,9 +59,10 @@ local pogTemplate = {
 
 -- Add your modules below:
 -- Make sure to only add Community Modules. If you remove/edit other community modules, your Pull Request will automatically be declined.
--- NOTE: autoEnable properties can only enable built-in modules. If you add a community module in the autoEnable property, we'll remove it.
+-- NOTE: The autoEnable property can only enable built-in modules. If you add a community module in the autoEnable property, we'll remove it.
 
 return {
 --> LIST <--
+
 --> LIST_END <--
 }
