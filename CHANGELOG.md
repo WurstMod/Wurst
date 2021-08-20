@@ -5,10 +5,11 @@
 ### Added
 
 - Themes (more in README.md)
-- Community Modules (more in community-modules.lua)
+- Community Modules (more in community-modules.lua or README.md)
 - New Modules
   - Debug
-  - YoutubeIntegration
+  - YoutubeLiveChat
+  - Waypoints
 
 ### Changed
 
@@ -20,8 +21,9 @@
 - Game-Specific Modules
   - PhantomForces
 - New Modules
-  - TwitchIntegration
+  - TwitchLiveChat
   - WurstChat
+  - TPFromDeath
 
 ### Maybe
 

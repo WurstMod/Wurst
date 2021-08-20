@@ -105,6 +105,10 @@ Example:
 loadstring(game:HttpGet("https://www.wurst-mod.tk/dev/latest.lua?theme=basic"))
 ```
 
+# Community Modules
+
+WurstMod also supports community modules (which can be found in community-modules.lua), which allows people to add their own module! All of the community modules are automatically added to the script, once accepted.
+
 # Controls
 
 - RControl - toggle gui

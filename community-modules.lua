@@ -34,7 +34,7 @@ local pogTemplate = {
             type = "choose",
             title = "Choose",
             value = 1,
-            options = {
+            choices = {
                 "Foo",
                 "Bar",
             }
@@ -46,7 +46,7 @@ local pogTemplate = {
         print(string.format("%s: %s", mod.settings.string.title, mod.settings.string.value))
         print(string.format("%s: %s", mod.settings.checkbox.title, mod.settings.number.value))
         print(string.format("%s: %s", mod.settings.key.title, mod.settings.key.value))
-        print(string.format("%s: %s", mod.settings.choose.title, mod.settings.choose.options[mod.settings.choose.value]))
+        print(string.format("%s: %s", mod.settings.choose.title, mod.settings.choose.choices[mod.settings.choose.value]))
         mod:disable()
     end,
     onDisable = function (mod)
@@ -54,6 +54,15 @@ local pogTemplate = {
     end,
     tick = function (mod)
         -- Tick, runs every frame when mod is enabled
+    end,
+    keyPressed = function (mod, input)
+        -- Modified UserInputService.InputBegan
+    end,
+    keyReleased = function (mod, input)
+        -- Modified UserInputService.InputEnded
+    end,
+    keyChanged = function (mod, input)
+        -- Modified UserInputService.InputChanged
     end
 }
 
