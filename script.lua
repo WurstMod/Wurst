@@ -19,8 +19,16 @@ local httpr = game:GetService("HttpService")
 
 local keycodes = {["Unknown"]=0,["Backspace"]=8,["Tab"]=9,["Clear"]=12,["Return"]=13,["Pause"]=19,["Escape"]=27,["Space"]=32,["QuotedDouble"]=34,["Hash"]=35,["Dollar"]=36,["Percent"]=37,["Ampersand"]=38,["Quote"]=39,["LeftParenthesis"]=40,["RightParenthesis"]=41,["Asterisk"]=42,["Plus"]=43,["Comma"]=44,["Minus"]=45,["Period"]=46,["Slash"]=47,["Zero"]=48,["One"]=49,["Two"]=50,["Three"]=51,["Four"]=52,["Five"]=53,["Six"]=54,["Seven"]=55,["Eight"]=56,["Nine"]=57,["Colon"]=58,["Semicolon"]=59,["LessThan"]=60,["Equals"]=61,["GreaterThan"]=62,["Question"]=63,["At"]=64,["LeftBracket"]=91,["BackSlash"]=92,["RightBracket"]=93,["Caret"]=94,["Underscore"]=95,["Backquote"]=96,["A"]=97,["B"]=98,["C"]=99,["D"]=100,["E"]=101,["F"]=102,["G"]=103,["H"]=104,["I"]=105,["J"]=106,["K"]=107,["L"]=108,["M"]=109,["N"]=110,["O"]=111,["P"]=112,["Q"]=113,["R"]=114,["S"]=115,["T"]=116,["U"]=117,["V"]=118,["W"]=119,["X"]=120,["Y"]=121,["Z"]=122,["LeftCurly"]=123,["Pipe"]=124,["RightCurly"]=125,["Tilde"]=126,["Delete"]=127,["KeypadZero"]=256,["KeypadOne"]=257,["KeypadTwo"]=258,["KeypadThree"]=259,["KeypadFour"]=260,["KeypadFive"]=261,["KeypadSix"]=262,["KeypadSeven"]=263,["KeypadEight"]=264,["KeypadNine"]=265,["KeypadPeriod"]=266,["KeypadDivide"]=267,["KeypadMultiply"]=268,["KeypadMinus"]=269,["KeypadPlus"]=270,["KeypadEnter"]=271,["KeypadEquals"]=272,["Up"]=273,["Down"]=274,["Right"]=275,["Left"]=276,["Insert"]=277,["Home"]=278,["End"]=279,["PageUp"]=280,["PageDown"]=281,["LeftShift"]=304,["RightShift"]=303,["LeftMeta"]=310,["RightMeta"]=309,["LeftAlt"]=308,["RightAlt"]=307,["LeftControl"]=306,["RightControl"]=305,["CapsLock"]=301,["NumLock"]=300,["ScrollLock"]=302,["LeftSuper"]=311,["RightSuper"]=312,["Mode"]=313,["Compose"]=314,["Help"]=315,["Print"]=316,["SysReq"]=317,["Break"]=318,["Menu"]=319,["Power"]=320,["Euro"]=321,["Undo"]=322,["F1"]=282,["F2"]=283,["F3"]=284,["F4"]=285,["F5"]=286,["F6"]=287,["F7"]=288,["F8"]=289,["F9"]=290,["F10"]=291,["F11"]=292,["F12"]=293,["F13"]=294,["F14"]=295,["F15"]=296,["World0"]=160,["World1"]=161,["World2"]=162,["World3"]=163,["World4"]=164,["World5"]=165,["World6"]=166,["World7"]=167,["World8"]=168,["World9"]=169,["World10"]=170,["World11"]=171,["World12"]=172,["World13"]=173,["World14"]=174,["World15"]=175,["World16"]=176,["World17"]=177,["World18"]=178,["World19"]=179,["World20"]=180,["World21"]=181,["World22"]=182,["World23"]=183,["World24"]=184,["World25"]=185,["World26"]=186,["World27"]=187,["World28"]=188,["World29"]=189,["World30"]=190,["World31"]=191,["World32"]=192,["World33"]=193,["World34"]=194,["World35"]=195,["World36"]=196,["World37"]=197,["World38"]=198,["World39"]=199,["World40"]=200,["World41"]=201,["World42"]=202,["World43"]=203,["World44"]=204,["World45"]=205,["World46"]=206,["World47"]=207,["World48"]=208,["World49"]=209,["World50"]=210,["World51"]=211,["World52"]=212,["World53"]=213,["World54"]=214,["World55"]=215,["World56"]=216,["World57"]=217,["World58"]=218,["World59"]=219,["World60"]=220,["World61"]=221,["World62"]=222,["World63"]=223,["World64"]=224,["World65"]=225,["World66"]=226,["World67"]=227,["World68"]=228,["World69"]=229,["World70"]=230,["World71"]=231,["World72"]=232,["World73"]=233,["World74"]=234,["World75"]=235,["World76"]=236,["World77"]=237,["World78"]=238,["World79"]=239,["World80"]=240,["World81"]=241,["World82"]=242,["World83"]=243,["World84"]=244,["World85"]=245,["World86"]=246,["World87"]=247,["World88"]=248,["World89"]=249,["World90"]=250,["World91"]=251,["World92"]=252,["World93"]=253,["World94"]=254,["World95"]=255,["ButtonX"]=1000,["ButtonY"]=1001,["ButtonA"]=1002,["ButtonB"]=1003,["ButtonR1"]=1004,["ButtonL1"]=1005,["ButtonR2"]=1006,["ButtonL2"]=1007,["ButtonR3"]=1008,["ButtonL3"]=1009,["ButtonStart"]=1010,["ButtonSelect"]=1011,["DPadLeft"]=1012,["DPadRight"]=1013,["DPadUp"]=1014,["DPadDown"]=1015,["Thumbstick1"]=1016,["Thumbstick2"]=1017}
 
-local function log(msg)
-	print("[WurstMod] " .. tostring(msg))
+local function log(msg, typ, sub)
+	if typ ~= "log" and typ ~= "warn" and typ ~= "error" then sub = typ end
+	
+	if not sub then sub = ""
+	else sub = "-" .. sub end
+	local str = string.format("[WurstMod%s] %s", sub, msg)
+	
+	if typ == "warn" then warn(str)
+	elseif typ == "error" then error(str)
+	else print(str) end
 end
 local function getKeyName(keyc)
 	
@@ -118,6 +126,56 @@ if plr.PlayerGui:FindFirstChild(config.gui.name) then
 	disable.Parent = game.ReplicatedStorage
 	repeat wait() until not plr.PlayerGui:FindFirstChild(config.gui.name)
 	wait(0.1)
+end
+
+local function draggableUI(frame, collisions)
+	local offX = 0
+	local offY = 0
+	local isHolding = false
+	
+	frame.Position = UDim2.new(0, frame.Position.X.Scale * workspace.CurrentCamera.ViewportSize.X, 0, frame.Position.Y.Scale * workspace.CurrentCamera.ViewportSize.Y)
+
+	frame.InputBegan:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 then
+			if not frame.Visible then return end
+			offX = mouse.X - frame.Position.X.Offset
+			offY = mouse.Y - frame.Position.Y.Offset
+			isHolding = true
+			
+			while wait() do
+				if not isHolding then return end
+
+				if not frame.Visible then isHolding = false return end
+				local posX = mouse.X - offX
+				local posY = mouse.Y - offY
+
+				local psX = posX / workspace.CurrentCamera.ViewportSize.X
+				local psY = posY / workspace.CurrentCamera.ViewportSize.Y
+				local szX = frame.AbsoluteSize.X / workspace.CurrentCamera.ViewportSize.X
+				local szY = frame.AbsoluteSize.Y / workspace.CurrentCamera.ViewportSize.Y
+
+				if collisions then
+					if psX <= 0 then psX = 0 end
+					if psY <= 0 then psY = 0 end
+					if (psX + szX) >= 1 then psX = 1 - szX end
+					if (psY + szY) >= 1 then psY = 1 - szY end
+				end
+
+				psX *= workspace.CurrentCamera.ViewportSize.X
+				psY *= workspace.CurrentCamera.ViewportSize.Y
+				
+				tweens:Create(frame, TweenInfo.new(.25), {
+					Position = UDim2.new(0, psX, 0, psY)
+				}):Play()
+			end
+		end
+	end)
+	frame.InputEnded:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 then
+			if not frame.Visible then return end
+			isHolding = false
+		end
+	end)
 end
 
 gui = Instance.new("ScreenGui", plr.PlayerGui)
@@ -480,14 +538,21 @@ modSettings_choose_optionHitbox.Size = UDim2.new(1, 0, 1, 0)
 modSettings_choose_optionHitbox.Image = ""
 modSettings_choose_optionHitbox.HoverImage = ""
 modSettings_choose_optionHitbox.ZIndex = modSettings.ZIndex + 2
---> THEME_END <--
 
---> THEME_YTB_START <--
 local liveYTChat = Instance.new("Frame", gui)
-liveYTChat.BackgroundTransparency = 1
+liveYTChat.BackgroundTransparency = 0.15
+liveYTChat.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
 liveYTChat.Name = "ytchat"
-liveYTChat.Size = UDim2.new(0.35, 0, 1, 0)
+liveYTChat.Size = UDim2.new(0.35, 0, 0.5, 0)
+liveYTChat.Position = UDim2.new(0, 0, 0.5, 0)
+liveYTChat.ClipsDescendants = true
 liveYTChat.ZIndex = config.gui.z + #gui:GetDescendants()
+liveYTChat.Visible = false
+
+draggableUI(liveYTChat, true)
+
+local liveYTChatUICorner = Instance.new("UICorner", liveYTChat)
+liveYTChatUICorner.CornerRadius = UDim.new(0, 15)
 
 local liveYTChat_list = Instance.new("UIListLayout", liveYTChat)
 liveYTChat_list.Name = "list"
@@ -508,9 +573,45 @@ liveYTChat_msg.TextStrokeTransparency = 1
 liveYTChat_msg.TextXAlignment = Enum.TextXAlignment.Left
 liveYTChat_msg.TextYAlignment = Enum.TextYAlignment.Bottom
 liveYTChat_msg.ZIndex = liveYTChat.ZIndex + 1
---> THEME_YTB_END <--
+
+local waypointBLB = Instance.new("BillboardGui")
+waypointBLB.Name = "waypoint_name"
+waypointBLB.AlwaysOnTop = true
+waypointBLB.MaxDistance = math.huge
+waypointBLB.Enabled = true
+waypointBLB.ResetOnSpawn = false
+waypointBLB.Size = UDim2.new(0, 100, 0, 100)
+waypointBLB.StudsOffset = Vector3.new(0, 3, 0)
+
+local waypointBLB_frame = Instance.new("TextLabel", waypointBLB)
+waypointBLB_frame.Name = "distance"
+waypointBLB_frame.AnchorPoint = Vector2.new(0.5, 1)
+waypointBLB_frame.BorderSizePixel = 0
+waypointBLB_frame.Position = UDim2.new(0.5, 0, 1, 0)
+waypointBLB_frame.Size = UDim2.new(0.5, 0, 0.5, 0)
+waypointBLB_frame.Font = Enum.Font.Nunito
+waypointBLB_frame.TextColor3 = Color3.new(1, 1, 1)
+waypointBLB_frame.TextScaled = true
+waypointBLB_frame.Text = "0m"
+waypointBLB_frame.ZIndex = 1
+
+local waypointBLB_frameUICorner = Instance.new("UICorner", waypointBLB_frame)
+waypointBLB_frameUICorner.CornerRadius = UDim.new(0.25, 0)
+
+local waypointBLB_title = Instance.new("TextLabel", waypointBLB)
+waypointBLB_title.Name = "title"
+waypointBLB_title.BackgroundTransparency = 1
+waypointBLB_title.Position = UDim2.new(0, 0, 0.25, 0)
+waypointBLB_title.Size = UDim2.new(1, 0, 0.25, 0)
+waypointBLB_title.Font = Enum.Font.Nunito
+waypointBLB_title.TextColor3 = Color3.new(1, 1, 1)
+waypointBLB_title.Text = "Title"
+waypointBLB_title.TextScaled = true
+waypointBLB_title.ZIndex = 2
+--> THEME_END <--
 
 local isSettings = false
+local isChangingKeybinds = false
 local mods = {}
 local wmod = {
 	name = "WurstMod",
@@ -671,7 +772,7 @@ local function buildSettings(mod, obj)
 				tooched = not tooched
 
 				if tooched then
-					mod.isChangingKeybind = true
+					isChangingKeybinds = true
 					key.value.BackgroundColor3 = Color3.fromHSV(0.333333, 1, 0.470588)
 					key.value.Text = "Waiting for Input..."
 					key.value.TextColor3 = Color3.fromRGB(216, 216, 216)
@@ -690,11 +791,11 @@ local function buildSettings(mod, obj)
 						key.value.BackgroundColor3 = Color3.fromHSV(0, 0, 0.235294)
 						tooched = not tooched
 						wait(.2)
-						if not tooched then mod.isChangingKeybind = false end
+						if not tooched then isChangingKeybinds = false end
 					end)
 					table.insert(stsEvents, evv)
 				else
-					mod.isChangingKeybind = false
+					isChangingKeybinds = false
 					if evv then evv:Disconnect() end
 					key.value.TextColor3 = Color3.new(1, 1, 1)
 					key.value.Text = getKeyName(v.value)
@@ -1472,12 +1573,6 @@ mods = {
 			mesh.Scale = part.Size
 			mesh.MeshType = Enum.MeshType.Sphere
 			mod.disc = part
-
-			mod.clickListen = UIS.InputBegan:Connect(function(k)
-				if not mod.isChangingKeybind and tonumber(mod.settings.tpkey.value) == tonumber(k.KeyCode.Value) then
-					plr.Character.PrimaryPart.CFrame = CFrame.new(mod.disc.Position + Vector3.new(0, plr.Character.PrimaryPart.Size.Y, 0))
-				end
-			end)
 		end,
 		tick = function(mod)
 			if mod.disc then
@@ -1491,6 +1586,11 @@ mods = {
 			mod.disc = nil
 			mouse.TargetFilter = mod.filter
 		end,
+		keyPressed = function(mod, k)
+			if tonumber(mod.settings.tpkey.value) == tonumber(k.KeyCode.Value) then
+				plr.Character.PrimaryPart.CFrame = CFrame.new(mod.disc.Position + Vector3.new(0, plr.Character.PrimaryPart.Size.Y, 0))
+			end
+		end
 	},
 	{
 		name = "PlayerESP",
@@ -1760,21 +1860,21 @@ mods = {
 		description = "Allows you to jump infinitely.",
 		settings = createOptions(),
 		onEnable = function(mod)
-			mod.ev = UIS.InputBegan:Connect(function(k, c)
-				if not charCheck(plr.Character) then return end
-				if c then return end
-				if k.KeyCode == Enum.KeyCode.Space then
-					local st = plr.Character.Humanoid:GetState()
-					if st == Enum.HumanoidStateType.Jumping or st == Enum.HumanoidStateType.Freefall then
-						plr.Character.Humanoid.UseJumpPower = true
-						local vl = plr.Character.PrimaryPart.Velocity
-						plr.Character.PrimaryPart.Velocity = Vector3.new(vl.X, plr.Character.Humanoid.JumpPower, vl.Z) 
-					end
-				end
-			end)
+			
 		end,
 		onDisable = function(mod)
-			mod.ev:Disconnect()
+			
+		end,
+		keyPressed = function(mod, k)
+			if not charCheck(plr.Character) then return end
+			if k.KeyCode == Enum.KeyCode.Space then
+				local st = plr.Character.Humanoid:GetState()
+				if st == Enum.HumanoidStateType.Jumping or st == Enum.HumanoidStateType.Freefall then
+					plr.Character.Humanoid.UseJumpPower = true
+					local vl = plr.Character.PrimaryPart.Velocity
+					plr.Character.PrimaryPart.Velocity = Vector3.new(vl.X, plr.Character.Humanoid.JumpPower, vl.Z) 
+				end
+			end
 		end,
 	},
 	{
@@ -1907,6 +2007,7 @@ mods = {
 			plr.Character.Archivable = rch
 			
 			for _, d in pairs(nchar:GetDescendants()) do
+				if d.ClassName:sub(#d.ClassName - 5) == "Script" and d.Name ~= "Animate" then d:Destroy() end
 				if d:IsA("BasePart") then d.Transparency += 0.5 end
 			end
 			
@@ -1928,7 +2029,7 @@ mods = {
 		tick = function(mod)
 			if mod.chr then
 				mod.chr.PrimaryPart.Velocity = Vector3.new()
-				mod.chr.PrimaryPart.CFrame = CFrame.new(Vector3.new(0, workspace.FallenPartsDestroyHeight + 10, 0))
+				mod.chr.PrimaryPart.CFrame = CFrame.new(Vector3.new(mod.nchr.PrimaryPart.Position.X, workspace.FallenPartsDestroyHeight + 15, mod.nchr.PrimaryPart.Position.Z))
 			end
 		end,
 		onDisable = function(mod)
@@ -2068,6 +2169,7 @@ mods = {
 				mod:disable()
 				return				
 			end
+			liveYTChat.Visible = true
 			
 			spawn(function()
 				while wait(.25) do
@@ -2110,14 +2212,6 @@ mods = {
 			end)
 		end,
 		tick = function(mod)
-			if mod.settings.side.value == 2 then
-				liveYTChat.AnchorPoint = Vector2.new(1, 0)
-				liveYTChat.Position = UDim2.new(1, 0, 0, 0)
-			else
-				liveYTChat.AnchorPoint = Vector2.new(0, 0)
-				liveYTChat.Position = UDim2.new(0, 0, 0, 0)
-			end
-			
 			liveYTChat_list.VerticalAlignment = Enum.VerticalAlignment[mod.settings.layout.options[mod.settings.layout.value]]
 			
 			local i = 1
@@ -2136,8 +2230,93 @@ mods = {
 			end
 		end,
 		onDisable = function(mod)
+			liveYTChat.Visible = true
 			for _, xd in pairs(liveYTChat:GetChildren()) do
 				if xd:IsA("TextLabel") then xd:Destroy() end
+			end
+		end,
+	},
+	{
+		name = "Waypoints",
+		id = "wponts",
+		description = "Allows you to save a location, and teleport to it",
+		settings = createOptions({
+			create = {
+				type = "key",
+				title = "Create Waypoint",
+				value = 0
+			},
+			points = {
+				type = "choose",
+				title = "Waypoints",
+				value = 0,
+				save = false,
+				options = {}
+			},
+			name = {
+				type = "string",
+				title = "The name of the new Waypont",
+				value = "My Waypoint"
+			},
+			tp = {
+				type = "key",
+				title = "Teleport to Waypoint",
+				value = 0
+			}
+		}),
+		saves = {},
+		onEnable = function(mod)
+			mod.parts = {}
+			
+			for _, save in pairs(mod.settings.points.options) do
+				local pos = mod.saves[save]
+				if pos then
+					mod:create(save, pos)
+				end
+			end
+		end,
+		onDisable = function(mod)
+			if mod.ev then mod.ev:Disconnect() end
+		end,
+		create = function(mod, save, pos)
+			local p = Instance.new("Part")
+			p.Transparency = 1
+			p.Anchored = true
+			p.CanCollide = false
+			p.CanTouch = false
+			p.Name = save
+			p.Position = pos
+			p.Size = Vector3.new(0.5, 0.5, 0.5)
+			p.Parent = workspace
+
+			local wpn = waypointBLB:Clone()
+			wpn.Name = save
+			wpn.title.Text = save
+			wpn.distance.BackgroundColor3 = Color3.fromHSV(math.random(0, 255) / 255, 1, 1)
+			wpn.Parent = p
+			table.insert(mod.parts, p)
+		end,
+		keyPressed = function(mod, k)
+			if tonumber(mod.settings.create.value) == tonumber(k.KeyCode.Value) then
+				local nm = mod.settings.name.value
+				if not table.find(mod.settings.points.options, nm) then
+					mod.saves[nm] = plr.Character.PrimaryPart.Position
+					table.insert(mod.settings.points.options, nm)
+					mod:create(nm, mod.saves[nm])
+				end
+			elseif tonumber(mod.settings.tp.value) == tonumber(k.KeyCode.Value) then
+				local nm = mod.settings.points.options[mod.settings.points.value]
+				if nm then
+					plr.Character.PrimaryPart.CFrame = CFrame.new(mod.saves[nm])
+				end
+			end
+		end,
+		tick = function(mod)
+			for _, p in pairs(mod.parts) do
+				local dist = (p.Position - plr.Character.PrimaryPart.Position).Magnitude
+				local meters = math.floor(dist * 0.82)
+
+				p[p.Name].distance.Text = string.format("%sm", meters)
 			end
 		end,
 	},
@@ -2221,6 +2400,7 @@ mods = {
 
 log("Loaded GUI")
 local speclColor = Color3.new(1, .8, 0)
+local communityColor = Color3.new(0.6, 0, 1)
 local defColor = description.TextColor3
 
 ev = game:GetService("RunService").Heartbeat:Connect(function()
@@ -2236,8 +2416,11 @@ ev = game:GetService("RunService").Heartbeat:Connect(function()
 			
 			if modObj then
 				description.Text = modObj.description
+				
 				if modObj.gameSpecific == game.PlaceId then description.TextColor3 = speclColor
+				elseif modObj.isCommunity then description.TextColor3 = communityColor
 				else description.TextColor3 = defColor end
+				
 				local onLine = texts:GetTextSize("", 14, description.Font, Vector2.new(math.huge, math.huge)).Y
 				local lines = texts:GetTextSize(description.Text, 14, description.Font, Vector2.new(math.huge, math.huge))
 				description.Size = UDim2.new((lines.X / workspace.CurrentCamera.ViewportSize.X) * 2, 0, het * (lines.Y / onLine), 0)
@@ -2270,6 +2453,7 @@ ev = game:GetService("RunService").Heartbeat:Connect(function()
 end)
 table.insert(events, ev)
 ev = UIS.InputBegan:Connect(function(k)
+	if isChangingKeybinds then return end
 	if k.KeyCode == Enum.KeyCode.RightControl then
 		if isSettings then
 			destroySettings()
@@ -2287,7 +2471,8 @@ ev = game:GetService("RunService").Stepped:Connect(function()
 	for _, mod in pairs(mods) do
 		if modToggle[mod.id] and modDid[mod.id] then
 			if mod.tick then
-				local scs, xd = pcall(mod.tick, mod, mod)
+				local scs, xd = pcall(mod.tick, mod)
+				if not scs then log("tick: " .. xd, "warn", mod.name) end
 			end
 		end
 	end
@@ -2329,6 +2514,50 @@ ev = game:GetService("RunService").Stepped:Connect(function()
 end)
 table.insert(events, ev)
 
+-- for modules
+UIS.InputBegan:Connect(function(input, c)
+	if c then return end
+	if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+	if isChangingKeybinds then return end
+
+	for _, mod in pairs(mods) do
+		if modToggle[mod.id] then
+			if mod.keyPressed then
+				local scs, xd = pcall(mod.keyPressed, mod, input)
+				if not scs then log("keyPressed: " .. xd, "warn", mod.name); mod:disable() end	
+			end
+		end
+	end
+end)
+UIS.InputChanged:Connect(function(input, c)
+	if c then return end
+	if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+	if isChangingKeybinds then return end
+
+	for _, mod in pairs(mods) do
+		if modToggle[mod.id] then
+			if mod.keyChanged then
+				local scs, xd = pcall(mod.keyChanged, mod, input)
+				if not scs then log("keyChanged: " .. xd, "warn", mod.name); mod:disable() end	
+			end
+		end
+	end
+end)
+UIS.InputEnded:Connect(function(input, c)
+	if c then return end
+	if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+	if isChangingKeybinds then return end
+
+	for _, mod in pairs(mods) do
+		if modToggle[mod.id] then
+			if mod.keyReleased then
+				local scs, xd = pcall(mod.keyReleased, mod, input)
+				if not scs then log("keyReleased: " .. xd, "warn", mod.name); mod:disable() end	
+			end
+		end
+	end
+end)
+
 
 for imod, mod in pairs(mods) do
 	if mod.gameSpecific and mod.gameSpecific ~= game.PlaceId then continue end
@@ -2339,14 +2568,17 @@ for imod, mod in pairs(mods) do
 	local modul = tempModule:Clone()
 	modul.Name = mod.id
 	modul.title.Text = mod.name
-	if mod.gameSpecific == game.PlaceId or mod.gameBonus == game.PlaceId then modul.title.TextColor3 = speclColor end
+	
+	if mod.gameSpecific == game.PlaceId or mod.gameBonus == game.PlaceId then modul.title.TextColor3 = speclColor
+	elseif mod.isCommunity then modul.title.TextColor3 = communityColor	 end
+	
 	modul.LayoutOrder = imod
 	modul.Parent = modulesList
 	
 	local sts = findByKey(gsettings, "id", mod.id)
 	if sts then
 		for x, d in pairs(sts.settings) do
-			if mod.settings[x] and d.value ~= nil then mod.settings[x].value = d.value end
+			if mod.settings[x] and d.value ~= nil and d.save ~= false then mod.settings[x].value = d.value end
 		end
 	end
 	
@@ -2366,7 +2598,8 @@ for imod, mod in pairs(mods) do
 				if mod.autoEnable then for _, m in pairs(mods) do
 					if not modToggle[m.id] and table.find(mod.autoEnable, m.id) then modTogEv[m.id]:Fire() end
 					end end
-				local scs, xd = pcall(mod.onEnable, mod, mod)
+				local scs, xd = pcall(mod.onEnable, mod)
+				if not scs then log("onEnable: " .. xd, "warn", mod.name); mod:disable() end
 				
 				modDid[mod.id] = true
 			end)
@@ -2398,7 +2631,8 @@ for imod, mod in pairs(mods) do
 			}):Play()
 
 			spawn(function()
-				pcall(mod.onDisable, mod, mod)
+				local scs, xd = pcall(mod.onDisable, mod)
+				if not scs then log("onDisable: " .. xd, "warn", mod.name) end
 				modDid[mod.id] = true
 			end)
 			
@@ -2422,7 +2656,7 @@ for imod, mod in pairs(mods) do
 	ev = UIS.InputBegan:Connect(function(kb, ch)
 		if ch then return end
 		
-		if mod.isChangingKeybind then return end
+		if isChangingKeybinds then return end
 		if kb.KeyCode == Enum.KeyCode.Unknown then return end
 		if tonumber(kb.KeyCode.Value) == tonumber(mod.settings.keybind.value) and kb.UserInputType == Enum.UserInputType.Keyboard then
 			togg()
@@ -2450,7 +2684,7 @@ end
 log("Loaded all modules")
 
 repeat wait() until game.ReplicatedStorage:FindFirstChild("disableWurst")
-log("Disabled")
+log("Disabled", "warn", "Old")
 
 gui:Destroy()
 game.ReplicatedStorage.disableWurst:Destroy()
