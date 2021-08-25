@@ -16,6 +16,7 @@ local Context = game:GetService("ContextActionService")
 local tweens = game:GetService("TweenService")
 local texts = game:GetService("TextService")
 local httpr = game:GetService("HttpService")
+local coreg = game:GetService("CoreGui")
 
 local keycodes = {["Unknown"]=0,["Backspace"]=8,["Tab"]=9,["Clear"]=12,["Return"]=13,["Pause"]=19,["Escape"]=27,["Space"]=32,["QuotedDouble"]=34,["Hash"]=35,["Dollar"]=36,["Percent"]=37,["Ampersand"]=38,["Quote"]=39,["LeftParenthesis"]=40,["RightParenthesis"]=41,["Asterisk"]=42,["Plus"]=43,["Comma"]=44,["Minus"]=45,["Period"]=46,["Slash"]=47,["Zero"]=48,["One"]=49,["Two"]=50,["Three"]=51,["Four"]=52,["Five"]=53,["Six"]=54,["Seven"]=55,["Eight"]=56,["Nine"]=57,["Colon"]=58,["Semicolon"]=59,["LessThan"]=60,["Equals"]=61,["GreaterThan"]=62,["Question"]=63,["At"]=64,["LeftBracket"]=91,["BackSlash"]=92,["RightBracket"]=93,["Caret"]=94,["Underscore"]=95,["Backquote"]=96,["A"]=97,["B"]=98,["C"]=99,["D"]=100,["E"]=101,["F"]=102,["G"]=103,["H"]=104,["I"]=105,["J"]=106,["K"]=107,["L"]=108,["M"]=109,["N"]=110,["O"]=111,["P"]=112,["Q"]=113,["R"]=114,["S"]=115,["T"]=116,["U"]=117,["V"]=118,["W"]=119,["X"]=120,["Y"]=121,["Z"]=122,["LeftCurly"]=123,["Pipe"]=124,["RightCurly"]=125,["Tilde"]=126,["Delete"]=127,["KeypadZero"]=256,["KeypadOne"]=257,["KeypadTwo"]=258,["KeypadThree"]=259,["KeypadFour"]=260,["KeypadFive"]=261,["KeypadSix"]=262,["KeypadSeven"]=263,["KeypadEight"]=264,["KeypadNine"]=265,["KeypadPeriod"]=266,["KeypadDivide"]=267,["KeypadMultiply"]=268,["KeypadMinus"]=269,["KeypadPlus"]=270,["KeypadEnter"]=271,["KeypadEquals"]=272,["Up"]=273,["Down"]=274,["Right"]=275,["Left"]=276,["Insert"]=277,["Home"]=278,["End"]=279,["PageUp"]=280,["PageDown"]=281,["LeftShift"]=304,["RightShift"]=303,["LeftMeta"]=310,["RightMeta"]=309,["LeftAlt"]=308,["RightAlt"]=307,["LeftControl"]=306,["RightControl"]=305,["CapsLock"]=301,["NumLock"]=300,["ScrollLock"]=302,["LeftSuper"]=311,["RightSuper"]=312,["Mode"]=313,["Compose"]=314,["Help"]=315,["Print"]=316,["SysReq"]=317,["Break"]=318,["Menu"]=319,["Power"]=320,["Euro"]=321,["Undo"]=322,["F1"]=282,["F2"]=283,["F3"]=284,["F4"]=285,["F5"]=286,["F6"]=287,["F7"]=288,["F8"]=289,["F9"]=290,["F10"]=291,["F11"]=292,["F12"]=293,["F13"]=294,["F14"]=295,["F15"]=296,["World0"]=160,["World1"]=161,["World2"]=162,["World3"]=163,["World4"]=164,["World5"]=165,["World6"]=166,["World7"]=167,["World8"]=168,["World9"]=169,["World10"]=170,["World11"]=171,["World12"]=172,["World13"]=173,["World14"]=174,["World15"]=175,["World16"]=176,["World17"]=177,["World18"]=178,["World19"]=179,["World20"]=180,["World21"]=181,["World22"]=182,["World23"]=183,["World24"]=184,["World25"]=185,["World26"]=186,["World27"]=187,["World28"]=188,["World29"]=189,["World30"]=190,["World31"]=191,["World32"]=192,["World33"]=193,["World34"]=194,["World35"]=195,["World36"]=196,["World37"]=197,["World38"]=198,["World39"]=199,["World40"]=200,["World41"]=201,["World42"]=202,["World43"]=203,["World44"]=204,["World45"]=205,["World46"]=206,["World47"]=207,["World48"]=208,["World49"]=209,["World50"]=210,["World51"]=211,["World52"]=212,["World53"]=213,["World54"]=214,["World55"]=215,["World56"]=216,["World57"]=217,["World58"]=218,["World59"]=219,["World60"]=220,["World61"]=221,["World62"]=222,["World63"]=223,["World64"]=224,["World65"]=225,["World66"]=226,["World67"]=227,["World68"]=228,["World69"]=229,["World70"]=230,["World71"]=231,["World72"]=232,["World73"]=233,["World74"]=234,["World75"]=235,["World76"]=236,["World77"]=237,["World78"]=238,["World79"]=239,["World80"]=240,["World81"]=241,["World82"]=242,["World83"]=243,["World84"]=244,["World85"]=245,["World86"]=246,["World87"]=247,["World88"]=248,["World89"]=249,["World90"]=250,["World91"]=251,["World92"]=252,["World93"]=253,["World94"]=254,["World95"]=255,["ButtonX"]=1000,["ButtonY"]=1001,["ButtonA"]=1002,["ButtonB"]=1003,["ButtonR1"]=1004,["ButtonL1"]=1005,["ButtonR2"]=1006,["ButtonL2"]=1007,["ButtonR3"]=1008,["ButtonL3"]=1009,["ButtonStart"]=1010,["ButtonSelect"]=1011,["DPadLeft"]=1012,["DPadRight"]=1013,["DPadUp"]=1014,["DPadDown"]=1015,["Thumbstick1"]=1016,["Thumbstick2"]=1017}
 
@@ -61,6 +62,40 @@ local function createOptions(obj, fc)
 	
 	return o
 end
+local function copyT(tabl)
+	local copy = {}
+	for k, v in pairs(tabl) do
+		if type(v) == "table" then
+			v = copyT(v)
+		end
+		copy[k] = v
+	end
+	return copy
+end
+
+local stringify
+stringify = function(v, spaces, usesemicolon, depth)
+	if type(v) ~= 'table' then
+		return tostring(v)
+	elseif not next(v) then
+		return '{}'
+	end
+
+	spaces = spaces or 4
+	depth = depth or 1
+
+	local space = (" "):rep(depth * spaces)
+	local sep = usesemicolon and ";" or ","
+	local concatenationBuilder = {"{"}
+
+	for k, x in next, v do
+		table.insert(concatenationBuilder, ("\n%s[%s] = %s%s"):format(space,type(k)=='number'and tostring(k)or('"%s"'):format(tostring(k)), stringify(x, spaces, usesemicolon, depth+1), sep))
+	end
+
+	local s = table.concat(concatenationBuilder)
+	return ("%s\n%s}"):format(s:sub(1,-2), space:sub(1, -spaces-1))
+end
+
 local function findPlr(str, multiple)
 	if multiple then
 		if str:lower() == "me" then return {plr} end
@@ -106,7 +141,17 @@ config.github = {}
 config.github.name = "WurstMod/Wurst/"
 config.github.branch = "dev"
 config.gui = {}
-config.gui.name = "wurst"
+config.gui.name = "_SecretWMD"
+config.gui.ogname = config.gui.name
+
+local function genrnm(lng)
+	local str = ""
+	for i = 1, lng do str = str .. tostring(math.random(1, 9)) end
+	return str
+end
+
+-- very disguised pog
+config.gui.name = genrnm(15) .. config.gui.name
 config.gui.z = 1000
 local veru = globalUrl .. config.github.branch .. "/lVersion"
 if not game:GetService("RunService"):IsStudio() then config.latestVersion = game:HttpGet(veru)
@@ -119,7 +164,20 @@ local events = {}
 local stsEvents = {}
 local ev, gui
 
-if plr.PlayerGui:FindFirstChild(config.gui.name) then
+local function hasChildWithEnding(par, str)
+	local chld = par:GetChildren()
+	for _, xd in pairs(chld) do
+		if xd:IsA("ScreenGui") and string.match(xd.Name, str) then
+			return xd
+		end
+	end
+	return nil
+end
+
+local chld = hasChildWithEnding(plr.PlayerGui, config.gui.ogname)
+if not game:GetService("RunService"):IsStudio() then chld = chld or hasChildWithEnding(coreg.RobloxGui, config.gui.ogname) end
+
+if chld then
 	log("WurstMod already exists, removing")
 	local disable = Instance.new("BoolValue")
 	disable.Name = "disableWurst"
@@ -133,7 +191,18 @@ local function draggableUI(frame, collisions)
 	local offY = 0
 	local isHolding = false
 	
-	frame.Position = UDim2.new(0, frame.Position.X.Scale * workspace.CurrentCamera.ViewportSize.X, 0, frame.Position.Y.Scale * workspace.CurrentCamera.ViewportSize.Y)
+	local function getPixels(f, TP)
+		local par = f.Parent
+		if par:IsA("ScreenGui") then par = workspace.CurrentCamera.ViewportSize
+		else par = par.AbsoluteSize end
+		
+		local xd = (f.Position[TP].Scale * par[TP]) + f.Position[TP].Offset
+		local sz = f.AbsoluteSize[TP] * f.AnchorPoint[TP]
+		return xd - sz
+	end
+	
+	frame.Position = UDim2.new(0, getPixels(frame, "X"), 0, getPixels(frame, "Y"))
+	frame.AnchorPoint = Vector2.new()
 
 	frame.InputBegan:Connect(function(i)
 		if i.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -164,7 +233,7 @@ local function draggableUI(frame, collisions)
 				psX *= workspace.CurrentCamera.ViewportSize.X
 				psY *= workspace.CurrentCamera.ViewportSize.Y
 				
-				tweens:Create(frame, TweenInfo.new(.25), {
+				tweens:Create(frame, TweenInfo.new(.5, Enum.EasingStyle.Exponential), {
 					Position = UDim2.new(0, psX, 0, psY)
 				}):Play()
 			end
@@ -178,13 +247,15 @@ local function draggableUI(frame, collisions)
 	end)
 end
 
-gui = Instance.new("ScreenGui", plr.PlayerGui)
+gui = Instance.new("ScreenGui")
 gui.DisplayOrder = config.gui.z
 gui.Name = config.gui.name
 gui.Enabled = true
 gui.IgnoreGuiInset = true
 gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+if game:GetService("RunService"):IsStudio() then gui.Parent = plr.PlayerGui
+else gui.Parent = coreg end
 
 --> THEME_START <--
 local title = Instance.new("Frame", gui)
@@ -543,8 +614,9 @@ local liveYTChat = Instance.new("Frame", gui)
 liveYTChat.BackgroundTransparency = 0.15
 liveYTChat.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
 liveYTChat.Name = "ytchat"
+liveYTChat.AnchorPoint = Vector2.new(0, 1)
 liveYTChat.Size = UDim2.new(0.35, 0, 0.5, 0)
-liveYTChat.Position = UDim2.new(0, 0, 0.5, 0)
+liveYTChat.Position = UDim2.new(0, 0, 1, 0)
 liveYTChat.ClipsDescendants = true
 liveYTChat.ZIndex = config.gui.z + #gui:GetDescendants()
 liveYTChat.Visible = false
@@ -561,18 +633,40 @@ liveYTChat_list.HorizontalAlignment = Enum.HorizontalAlignment.Left
 liveYTChat_list.SortOrder = Enum.SortOrder.LayoutOrder
 liveYTChat_list.VerticalAlignment = Enum.VerticalAlignment.Bottom
 
-local liveYTChat_msg = Instance.new("TextLabel")
+local liveYTChat_msg = Instance.new("Frame")
 liveYTChat_msg.BackgroundTransparency = 1
-liveYTChat_msg.Size = UDim2.new(1, 0, 0.1, 0)
-liveYTChat_msg.Font = Enum.Font.Nunito
-liveYTChat_msg.RichText = true
-liveYTChat_msg.TextColor3 = Color3.new(1, 1, 1)
-liveYTChat_msg.TextScaled = true
-liveYTChat_msg.TextStrokeColor3 = Color3.new(1, 1, 1)
-liveYTChat_msg.TextStrokeTransparency = 1
-liveYTChat_msg.TextXAlignment = Enum.TextXAlignment.Left
-liveYTChat_msg.TextYAlignment = Enum.TextYAlignment.Bottom
-liveYTChat_msg.ZIndex = liveYTChat.ZIndex + 1
+liveYTChat_msg.Size = UDim2.new(1, 0, 0.125, 0)
+liveYTChat_msg.ZIndex = config.gui.z + #gui:GetDescendants()
+
+local liveYTChat_msg_text = Instance.new("TextLabel", liveYTChat_msg)
+liveYTChat_msg_text.Name = "text"
+liveYTChat_msg_text.BackgroundTransparency = 1
+liveYTChat_msg_text.Size = UDim2.new(0.85, 0, 1, 0)
+liveYTChat_msg_text.Position = UDim2.new(0.15, 0, 0, 0)
+liveYTChat_msg_text.Font = Enum.Font.Nunito
+liveYTChat_msg_text.RichText = true
+liveYTChat_msg_text.TextColor3 = Color3.new(1, 1, 1)
+liveYTChat_msg_text.TextScaled = true
+liveYTChat_msg_text.TextStrokeColor3 = Color3.new(1, 1, 1)
+liveYTChat_msg_text.TextStrokeTransparency = 1
+liveYTChat_msg_text.TextXAlignment = Enum.TextXAlignment.Left
+liveYTChat_msg_text.TextYAlignment = Enum.TextYAlignment.Bottom
+liveYTChat_msg_text.ZIndex = liveYTChat_msg.ZIndex + 1
+
+local liveYTChat_msg_avatar = Instance.new("Frame", liveYTChat_msg)
+liveYTChat_msg_avatar.Name = "avatar"
+liveYTChat_msg_avatar.AnchorPoint = Vector2.new(0, 0.5)
+liveYTChat_msg_avatar.Size = UDim2.new(0.08, 0, 0.08, 0)
+liveYTChat_msg_avatar.Position = UDim2.new(0.035, 0, 0.5, 0)
+liveYTChat_msg_avatar.SizeConstraint = Enum.SizeConstraint.RelativeXX
+liveYTChat_msg_avatar.BackgroundTransparency = 1
+liveYTChat_msg_avatar.ZIndex = liveYTChat_msg_text.ZIndex + 1
+
+local liveYTChat_msg_avatar_UIGridLayout = Instance.new("UIGridLayout", liveYTChat_msg_avatar)
+liveYTChat_msg_avatar_UIGridLayout.CellPadding = UDim2.new()
+liveYTChat_msg_avatar_UIGridLayout.FillDirection = Enum.FillDirection.Horizontal
+liveYTChat_msg_avatar_UIGridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+liveYTChat_msg_avatar_UIGridLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
 local waypointBLB = Instance.new("BillboardGui")
 waypointBLB.Name = "waypoint_name"
@@ -609,6 +703,41 @@ waypointBLB_title.Text = "Title"
 waypointBLB_title.TextScaled = true
 waypointBLB_title.ZIndex = 2
 --> THEME_END <--
+
+local function drawImage(fram, data)
+	local dt = data
+	if type(dt) == "string" then
+		local dtt = {
+			Url = data,
+			Method = "GET",
+		}
+		
+		local dat
+		if game:GetService("RunService"):IsStudio() then dat = game.ReplicatedStorage.postWeb:InvokeServer(dtt)
+		else dat = http_request(dtt) end
+		dt = httpr:JSONDecode(dat.Body)
+	end
+	
+	fram:FindFirstChildOfClass("UIGridLayout").CellSize = UDim2.new(1 / dt.width, 0, 1 / dt.height, 0)
+	
+	for i, d in pairs(dt.data) do
+		local fr = Instance.new("Frame")
+		fr.BackgroundColor3 = Color3.fromRGB(d[1], d[2], d[3])
+		fr.BorderSizePixel = 0
+		fr.BackgroundTransparency = 1 - (d[4] / 255)
+		local yY = i / dt.width
+		local y = math.floor(yY)
+		local x = i - (y * dt.width)
+		fr.Name = x .. "x" .. y
+		fr.LayoutOrder = i
+		fr.ZIndex = fram.ZIndex + 1
+		fr.Parent = fram
+
+		--if yY == y then wait() end
+	end
+	
+	return dt
+end
 
 local isSettings = false
 local isChangingKeybinds = false
@@ -661,7 +790,9 @@ local function findByKey(o, k, v)
 	return obj
 end
 
+local settingCache = {}
 local function buildSettings(mod, obj)
+	settingCache[mod.id] = copyT(obj)
 	isSettings = true
 	local setts = modSettings:Clone()
 	local title = modSettings_title:Clone()
@@ -780,17 +911,20 @@ local function buildSettings(mod, obj)
 					evv = UIS.InputBegan:Connect(function(kb, ch)
 						if ch then return end
 						if kb.UserInputType ~= Enum.UserInputType.Keyboard then return end
+						
+						local val = kb.KeyCode.Value
+						if val == Enum.KeyCode.RightControl.Value then val = 0 end
 
 						if evv then evv:Disconnect() end
 						local kebs = getKeybinds()
 
-						v.value = kb.KeyCode.Value
+						v.value = val
 						key.value.TextColor3 = Color3.new(1, 1, 1)
 						key.value.Text = getKeyName(v.value)
 						key.value.TextColor3 = getColor(kebs, v.value)
 						key.value.BackgroundColor3 = Color3.fromHSV(0, 0, 0.235294)
 						tooched = not tooched
-						wait(.2)
+						wait(0.2)
 						if not tooched then isChangingKeybinds = false end
 					end)
 					table.insert(stsEvents, evv)
@@ -845,16 +979,24 @@ local function buildSettings(mod, obj)
 	setts.Parent = modules
 end
 
-local settCachce = {}
 local function destroySettings()
 	isSettings = false
-	if modules:FindFirstChild("settings") then spawn(function()
+	if modules:FindFirstChild("settings") then
 		spawn(function()
-			saveSettings()
+			local ID = modules.settings.ID.Value
+			spawn(function()
+				local mod = findByKey(mods, "id", ID)
+				local str1 = stringify(settingCache[mod.id])
+				local str2 = stringify(mod.settings)
+				
+				if mod and str1 ~= str2 then
+					saveSettings()	
+				end
+			end)
+			modules.settings:Destroy()
+			modulesList.Visible = true
 		end)
-		modules.settings:Destroy()
-		modulesList.Visible = true
-	end) end
+	end
 	for _, e in pairs(stsEvents) do
 		e:Disconnect()
 	end
@@ -970,6 +1112,7 @@ if game.PlaceId == 142823291 then
 	dod()
 end
 
+local modTick = {}
 local modToggle = {}
 local modEvs = {}
 local modDid = {}
@@ -1043,9 +1186,6 @@ mods = {
 			mod.data.freecamZoom = workspace.CurrentCamera.FieldOfView
 			mod.data.freecamCamTyp = workspace.CurrentCamera.CameraType
 			mod.data.freecamCamCF = workspace.CurrentCamera.CFrame
-
-			print(math.deg(mod.data.freecamOrt.X))
-			print(math.deg(mod.data.freecamOrt.Y))
 
 			mod.data.camX = math.deg(mod.data.freecamOrt.Y)
 			mod.data.camY = math.deg(mod.data.freecamOrt.X)
@@ -1124,33 +1264,10 @@ mods = {
 		onDisable = function() end,
 		tick = function(mod)
 			if not charCheck(plr.Character) then return end
-
-			if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
-				plr.Character.Head.CanCollide = false
-				plr.Character.UpperTorso.CanCollide = false
-				plr.Character.LowerTorso.CanCollide = false
-				plr.Character.RightUpperArm.CanCollide = false
-				plr.Character.RightLowerArm.CanCollide = false
-				plr.Character.RightHand.CanCollide = false
-				plr.Character.LeftUpperArm.CanCollide = false
-				plr.Character.LeftLowerArm.CanCollide = false
-				plr.Character.LeftHand.CanCollide = false
-				plr.Character.LeftUpperLeg.CanCollide = false
-				plr.Character.LeftLowerLeg.CanCollide = false
-				plr.Character.LeftFoot.CanCollide = false
-				plr.Character.RightUpperLeg.CanCollide = false
-				plr.Character.RightLowerLeg.CanCollide = false
-				plr.Character.RightFoot.CanCollide = false
-			else
-				plr.Character.Head.CanCollide = false
-				plr.Character.Torso.CanCollide = false
-				plr.Character["Right Arm"].CanCollide = false
-				plr.Character["Left Arm"].CanCollide = false
-				plr.Character["Right Leg"].CanCollide = false
-				plr.Character["Left Leg"].CanCollide = false
+			
+			for _, p in pairs(plr.Character:GetChildren()) do
+				if p:IsA("BasePart") then p.CanCollide = false; p.CanTouch = false end
 			end
-
-			plr.Character.HumanoidRootPart.CanCollide = false
 		end,
 	},
 	{
@@ -1266,6 +1383,11 @@ mods = {
 				value = 60,
 				min = 1,
 				max = 1000
+			},
+			altDir = {
+				type = "checkbox",
+				title = "ALT Directions",
+				value = false
 			}
 		}),
 		data = {
@@ -1323,18 +1445,29 @@ mods = {
 			if not charCheck(plr.Character) then return end
 			
 			plr.Character.Humanoid.PlatformStand = true
-			plr.Character.Humanoid.AutoRotate = false
+			plr.Character.Humanoid.AutoRotate = true
 			
 			local keyb = mod.data.flyKeyboard
 			local vel = CFrame.new()
 			local cf = workspace.CurrentCamera.CFrame
+			local ogcf = cf
 			
+			if mod.settings.altDir.value then
+				local abc = plr.Character.PrimaryPart:Clone()
+				abc.Orientation = Vector3.new(0, abc.Orientation.Y, 0)
+				cf = abc.CFrame
+				abc:Destroy()
+				abc = nil
+			end
 			vel = vel - cf.RightVector * keyb.A			-- A
 			vel = vel + cf.RightVector * keyb.D			-- D
 			vel = vel - cf.LookVector * keyb.S			-- S
 			vel = vel + cf.LookVector * keyb.W			-- W
+			
 			vel = vel - Vector3.new(0, 1, 0) * keyb.Q	-- Q
 			vel = vel + Vector3.new(0, 1, 0) * keyb.E	-- Q
+			
+			cf = ogcf
 			
 			for _, a in pairs(plr.Character:GetChildren()) do
 				if a:IsA("BasePart") then
@@ -1342,7 +1475,9 @@ mods = {
 					a.AssemblyLinearVelocity = Vector3.new()
 				end
 			end
-			mod.flyVel.Velocity = vel.p
+			tweens:Create(mod.flyVel, TweenInfo.new(0.05, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
+				Velocity = vel.p
+			}):Play()
 			plr.Character.PrimaryPart.CFrame = CFrame.new(plr.Character.PrimaryPart.Position, cf:ToWorldSpace(CFrame.new(0, 0, -999999)).p)
 		end,
 	},
@@ -1412,7 +1547,7 @@ mods = {
 			mod.flingVel = Instance.new("BodyAngularVelocity")
 			mod.flingVel.AngularVelocity = Vector3.new(0, power, 0)
 			mod.flingVel.MaxTorque = Vector3.new(0, power, 0)
-			mod.flingVel.Parent = plr.Character.HumanoidRootPart
+			mod.flingVel.Parent = plr.Character.PrimaryPart
 		end,
 		onDisable = function(mod)
 			mod.flingVel:Destroy()
@@ -1891,7 +2026,7 @@ mods = {
 			hmn.Name = "1"
 			l.Parent = plr.Character
 			l.Name = "Humanoid"
-			wait(.1)
+			wait(0.1)
 			hmn:Destroy()
 		end,
 		onDisable = function(mod)
@@ -1995,24 +2130,35 @@ mods = {
 	{
 		name = "Invisible",
 		id = "invsb",
-		description = "Makes you invisible. (most of the time - kinda buggy)",
-		settings = createOptions(),
 		deathDisable = true,
+		description = "Makes you invisible (most of the time)",
+		settings = createOptions(),
 		onEnable = function(mod)
 			mod.chr = plr.Character
+			local platform = Instance.new("Part", workspace)
+			platform.Name = "platform"
+			platform.Anchored = true
+			platform.Size = Vector3.new(15, 1, 15)
+			mod.platform = platform
 			
 			local rch = plr.Character.Archivable
 			plr.Character.Archivable = true
 			local nchar = plr.Character:Clone()
 			plr.Character.Archivable = rch
 			
+			nchar.Humanoid:ClearAllChildren()
+			
 			for _, d in pairs(nchar:GetDescendants()) do
-				if d.ClassName:sub(#d.ClassName - 5) == "Script" and d.Name ~= "Animate" then d:Destroy() end
 				if d:IsA("BasePart") then d.Transparency += 0.5 end
 			end
 			
 			nchar.Name = "N_" .. plr.Name
 			nchar.Parent = workspace
+			
+			mod.ev = nchar:WaitForChild("Humanoid").Died:Connect(function()
+				mod.ev:Disconnect()
+				mod:disable()
+			end)
 			
 			mod.nchr = nchar
 			
@@ -2029,11 +2175,24 @@ mods = {
 		tick = function(mod)
 			if mod.chr then
 				mod.chr.PrimaryPart.Velocity = Vector3.new()
-				mod.chr.PrimaryPart.CFrame = CFrame.new(Vector3.new(mod.nchr.PrimaryPart.Position.X, workspace.FallenPartsDestroyHeight + 15, mod.nchr.PrimaryPart.Position.Z))
+				local cfrm = Vector3.new(mod.nchr.PrimaryPart.Position.X, workspace.FallenPartsDestroyHeight + 5, mod.nchr.PrimaryPart.Position.Z)
+				mod.platform.CFrame = CFrame.new(cfrm)
+				mod.chr.PrimaryPart.CFrame = CFrame.new(cfrm + Vector3.new(math.random(-5, 5), 4, math.random(-5, 5)))
+			end
+			
+			if mod.nchr and mod.nchr.PrimaryPart then
+				mod.cfr = mod.nchr.PrimaryPart.CFrame
 			end
 		end,
 		onDisable = function(mod)
-			mod.chr.PrimaryPart.CFrame = mod.nchr.PrimaryPart.CFrame
+			if mod.ev then mod.ev:Disconnect() end
+			if mod.platform then mod.platform:Destroy(); mod.platform = nil end
+			
+			local cf = mod.nchr.PrimaryPart
+			if cf then cf = cf.CFrame
+			else cf = mod.cfr end
+			
+			mod.chr.PrimaryPart.CFrame = cf
 			
 			workspace.CurrentCamera.CameraSubject = mod.chr.Humanoid
 			plr.Character = mod.chr
@@ -2143,15 +2302,6 @@ mods = {
 				title = "ID of a Youtube Video",
 				value = ""
 			},
-			side = {
-				type = "choose",
-				title = "Side",
-				value = 1,
-				options = {
-					"Left",
-					"Right"
-				}
-			},
 			layout = {
 				type = "choose",
 				title = "Layout",
@@ -2163,53 +2313,65 @@ mods = {
 			}
 		}),
 		jsonCache = {},
+		avCache = {},
 		onEnable = function(mod)
-			if not mod.settings.id.value or mod.settings.id.value == "" then
-				mod.jsonCache = {}
-				mod:disable()
-				return				
-			end
+			if not mod.settings.id.value or mod.settings.id.value == "" then return mod:disable() end
 			liveYTChat.Visible = true
 			
-			spawn(function()
-				while wait(.25) do
-					if not modToggle[mod.id] then return end
-					
-					local datt
-					local dat = {
-						Url = globalUrl .. "api/ytchat?id=" .. mod.settings.id.value,
-						Method = "GET"
-					}
-					if game:GetService("RunService"):IsStudio() then datt = http_request:InvokeServer(dat)
-					else datt = http_request(dat) end
+			local ogChat = mod.settings.id.value
+			mod.setInterval(function()
+				if not modToggle[mod.id] then return end
+				
+				if mod.settings.id.value ~= ogChat then return mod:disable() end
 
-					if datt.Status == 404 then
-						mod.jsonCache = {}
-						mod:disable()
-						return
-					else
-						local llua = httpr:JSONDecode(datt.Body)
-						local ids = {}
-						for _, d in pairs(mod.jsonCache) do table.insert(ids, d.id) end
+				local datt
+				local dat = {
+					Url = globalUrl .. "api/ytchat?id=" .. mod.settings.id.value,
+					Method = "GET"
+				}
+				if game:GetService("RunService"):IsStudio() then datt = http_request:InvokeServer(dat)
+				else datt = http_request(dat) end
 
-						spawn(function()
-							if #ids == 0 then return end
-							for j, m in pairs(llua) do
-								if not table.find(ids, m.id) then
-									if not m.pinned then
-										local msg = liveYTChat_msg:Clone()
-										msg.Name = m.id
-										msg.Text = string.format("<b>%s</b> %s", m.author.name, m.text)
-										msg.LayoutOrder = tick()
-										msg.Parent = liveYTChat
+				if datt.Status == 404 or datt.StatusCode == 404 or not datt.Success then return mod:disable()
+				else
+					local llua = httpr:JSONDecode(datt.Body)
+					local ids = {}
+					for _, d in pairs(mod.jsonCache) do table.insert(ids, d.id) end
+
+					spawn(function()
+						if #ids == 0 then return end
+						for j, m in pairs(llua) do
+							if not table.find(ids, m.id) then
+								if not m.pinned then
+									local msg = liveYTChat_msg:Clone()
+									msg.Name = m.id
+									msg.text.Text = string.format("<font color='rgb(179,179,179)'><b>%s</b></font> %s", m.author.name, m.text)
+									local cach = mod.avCache[m.author.channel]
+									local saiz = 16
+									if cach then
+										drawImage(msg.avatar, cach)
+									else
+										mod.avCache[m.author.channel] = drawImage(
+											msg.avatar,
+											string.format(
+												"%sapi/imagedat?url=%s&width=%s&height=%s",
+												globalUrl,
+												m.avatar.url,
+												tostring(saiz),
+												tostring(saiz)
+											)
+										) -- you can use this if u want!
 									end
+									msg.LayoutOrder = tick()
+									msg.Parent = liveYTChat
+									print(string.format("%s: %s", m.author.name, m.text))
 								end
 							end
-						end)
-						mod.jsonCache = llua
-					end
+						end
+					end)
+					mod.jsonCache = llua
 				end
-			end)
+			end, 0.5)
 		end,
 		tick = function(mod)
 			liveYTChat_list.VerticalAlignment = Enum.VerticalAlignment[mod.settings.layout.options[mod.settings.layout.value]]
@@ -2217,22 +2379,23 @@ mods = {
 			local i = 1
 			for _, m in pairs(liveYTChat:GetChildren()) do
 				if m:IsA("TextLabel") then
-					m.TextXAlignment = Enum.TextXAlignment[mod.settings.side.options[mod.settings.side.value]]
-					if (m.LayoutOrder > 0 and mod.settings.layout.value == 1) or (m.LayoutOrder < 0 and mod.settings.layout.value == 2) then
-						m.LayoutOrder = -m.LayoutOrder
-					end
+					--if (m.LayoutOrder > 0 and mod.settings.layout.value == 1) or (m.LayoutOrder < 0 and mod.settings.layout.value == 2) then
+					--	m.LayoutOrder = -m.LayoutOrder
+					--end
 						
 					local siz = 0.02907915993538 -- 18
-					local sz = texts:GetTextSize(m.Text, siz * workspace.CurrentCamera.ViewportSize.Y, m.Font, Vector2.new(m.AbsoluteSize.X, math.huge))
+					local sz = texts:GetTextSize(m.text.Text, siz * workspace.CurrentCamera.ViewportSize.Y, m.text.Font, Vector2.new(m.text.AbsoluteSize.X, math.huge))
 					m.Size = UDim2.new(m.Size.X, UDim.new(sz.Y / m.Parent.AbsoluteSize.Y, 0))
 					i += 1
 				end
 			end
 		end,
 		onDisable = function(mod)
-			liveYTChat.Visible = true
+			mod.jsonCache = {}
+			mod.avCache = {}
+			liveYTChat.Visible = false
 			for _, xd in pairs(liveYTChat:GetChildren()) do
-				if xd:IsA("TextLabel") then xd:Destroy() end
+				if xd:IsA("Frame") then xd:Destroy() end
 			end
 		end,
 	},
@@ -2263,7 +2426,12 @@ mods = {
 				title = "Teleport to Waypoint",
 				value = 0
 			}
-		}),
+		}, function(md)
+			if game.PlaceId == 142823291 then
+				table.insert(md.points.options, "MM2 Murderer")
+				table.insert(md.points.options, "MM2 Sherrif")
+			end
+		end),
 		saves = {},
 		onEnable = function(mod)
 			mod.parts = {}
@@ -2378,12 +2546,13 @@ mods = {
 			
 			spawn(function()
 				while enb and wait() do
+					plr.Character.PrimaryPart.Anchored = true
 					plr.Character.PrimaryPart.CFrame = CFrame.new(ps)
 					plr.Character.PrimaryPart.Velocity = Vector3.new()
 				end
 			end)
 			
-			wait(.25)
+			wait(.15)
 			enb = false
 			wait()
 			plr.Character.PrimaryPart.Velocity = vl
@@ -2564,6 +2733,7 @@ for imod, mod in pairs(mods) do
 	mod.settings = mod.settings or createOptions()
 	modToggle[mod.id] = false
 	modEvs[mod.id] = {}
+	mod.intervals = {}
 	modTogEv[mod.id] = Instance.new("BindableEvent")
 	local modul = tempModule:Clone()
 	modul.Name = mod.id
@@ -2593,11 +2763,44 @@ for imod, mod in pairs(mods) do
 			tweens:Create(modul, TweenInfo.new(0.2), {
 				BackgroundColor3 = Color3.new(0, 1, 0)
 			}):Play()
+			local now = tick()
 
 			spawn(function()
 				if mod.autoEnable then for _, m in pairs(mods) do
 					if not modToggle[m.id] and table.find(mod.autoEnable, m.id) then modTogEv[m.id]:Fire() end
 					end end
+				
+				modTick[mod.id] = now
+				
+				mod.setInterval = function(func, tim, ...)
+					if not func then log("setInterval: Argument 1 missing or nil", "warn", mod.name) return end
+					if type(func) ~= "function" then log(string.format("setInterval: Unable to cast %s to function", type(func)), "warn", mod.name) return end
+					if not tim then log("setInterval: Argument 2 missing or nil", "warn", mod.name) return end
+					tim = tonumber(tim) or tim
+					if type(tim) ~= "number" then log(string.format("setInterval: Unable to cast %s to number", type(tim)), "warn", mod.name) return end
+					local args = table.pack(...)
+					local noW = tick()
+					table.insert(mod.intervals, noW)
+					spawn(function()
+						while wait(tim) do
+							if not table.find(mod.intervals, noW) then break end
+							if not modToggle[mod.id] or modTick[mod.id] ~= now then if table.find(mod.intervals, noW) then table.remove(mod.intervals, table.find(mod.intervals, noW)) end break end
+							spawn(function()
+								func(unpack(args))
+							end)
+						end
+					end)
+				end
+				mod.clearInterval = function(numb)
+					if not numb then log("clearInterval: Argument 1 missing or nil", "warn", mod.name) return end
+					numb = tonumber(numb) or numb
+					if type(numb) ~= "number" then log(string.format("setInterval: Unable to cast %s to number", type(numb)), "warn", mod.name) return end
+
+					if table.find(mod.intervals, numb) then
+						table.remove(mod.intervals, table.find(mod.intervals, numb))
+					else log("clearInterval: Invalid interval number") end
+				end
+				
 				local scs, xd = pcall(mod.onEnable, mod)
 				if not scs then log("onEnable: " .. xd, "warn", mod.name); mod:disable() end
 				

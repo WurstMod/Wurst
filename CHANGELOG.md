@@ -20,10 +20,10 @@
 
 - Game-Specific Modules
   - PhantomForces
+  - MadCity
 - New Modules
   - TwitchLiveChat
   - WurstChat
-  - TPFromDeath
 
 ### Maybe
 
