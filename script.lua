@@ -655,9 +655,8 @@ liveYTChat_msg_text.ZIndex = liveYTChat_msg.ZIndex + 1
 
 local liveYTChat_msg_avatar = Instance.new("Frame", liveYTChat_msg)
 liveYTChat_msg_avatar.Name = "avatar"
-liveYTChat_msg_avatar.AnchorPoint = Vector2.new(0, 0.5)
 liveYTChat_msg_avatar.Size = UDim2.new(0.08, 0, 0.08, 0)
-liveYTChat_msg_avatar.Position = UDim2.new(0.035, 0, 0.5, 0)
+liveYTChat_msg_avatar.Position = UDim2.new(0.035, 0, 0, 0)
 liveYTChat_msg_avatar.SizeConstraint = Enum.SizeConstraint.RelativeXX
 liveYTChat_msg_avatar.BackgroundTransparency = 1
 liveYTChat_msg_avatar.ZIndex = liveYTChat_msg_text.ZIndex + 1
@@ -1556,7 +1555,7 @@ mods = {
 	},
 	{
 		name = "KillAura",
-		gameBonus = 142823291,
+		gameBonus = { 142823291 },
 		id = "klaura",
 		description = "Makes your character look at anyone near the radius.",
 		settings = createOptions({
@@ -1729,7 +1728,7 @@ mods = {
 	},
 	{
 		name = "PlayerESP",
-		gameBonus = 142823291,
+		gameBonus = { 142823291 },
 		id = "pesp",
 		description = "See all players through walls, basically like XRay.",
 		settings = createOptions({
@@ -2378,12 +2377,12 @@ mods = {
 			
 			local i = 1
 			for _, m in pairs(liveYTChat:GetChildren()) do
-				if m:IsA("TextLabel") then
-					--if (m.LayoutOrder > 0 and mod.settings.layout.value == 1) or (m.LayoutOrder < 0 and mod.settings.layout.value == 2) then
-					--	m.LayoutOrder = -m.LayoutOrder
-					--end
+				if m:IsA("Frame") then
+					if (m.LayoutOrder > 0 and mod.settings.layout.value == 1) or (m.LayoutOrder < 0 and mod.settings.layout.value == 2) then
+						m.LayoutOrder = -m.LayoutOrder
+					end
 						
-					local siz = 0.02907915993538 -- 18
+					local siz = 0.032102728731942 -- 20
 					local sz = texts:GetTextSize(m.text.Text, siz * workspace.CurrentCamera.ViewportSize.Y, m.text.Font, Vector2.new(m.text.AbsoluteSize.X, math.huge))
 					m.Size = UDim2.new(m.Size.X, UDim.new(sz.Y / m.Parent.AbsoluteSize.Y, 0))
 					i += 1
@@ -2492,7 +2491,7 @@ mods = {
 		name = "RoleNotifications",
 		id = "mm2_rlnotif",
 		description = "[MM2] Sends Notifications everyone round, with who has which role",
-		gameSpecific = 142823291,
+		gameSpecific = { 142823291 },
 		settings = createOptions(),
 		onEnable = function(mod)
 			mod.ev = mm2Evs.notifications.Event:Connect(function(ttl, txt, img, time)
@@ -2519,7 +2518,7 @@ mods = {
 		name = "TpToGun",
 		id = "mm2_ttg",
 		description = "[MM2] Teleports you to the gun",
-		gameSpecific = 142823291,
+		gameSpecific = { 142823291 },
 		settings = createOptions({
 			gun = {
 				type = "string",
@@ -2586,7 +2585,7 @@ ev = game:GetService("RunService").Heartbeat:Connect(function()
 			if modObj then
 				description.Text = modObj.description
 				
-				if modObj.gameSpecific == game.PlaceId then description.TextColor3 = speclColor
+				if modObj.gameSpecific and table.find(modObj.gameSpecific, game.PlaceId) then description.TextColor3 = speclColor
 				elseif modObj.isCommunity then description.TextColor3 = communityColor
 				else description.TextColor3 = defColor end
 				
@@ -2729,7 +2728,7 @@ end)
 
 
 for imod, mod in pairs(mods) do
-	if mod.gameSpecific and mod.gameSpecific ~= game.PlaceId then continue end
+	if mod.gameSpecific and not table.find(mod.gameSpecific, game.PlaceId) then continue end
 	mod.settings = mod.settings or createOptions()
 	modToggle[mod.id] = false
 	modEvs[mod.id] = {}
@@ -2739,7 +2738,7 @@ for imod, mod in pairs(mods) do
 	modul.Name = mod.id
 	modul.title.Text = mod.name
 	
-	if mod.gameSpecific == game.PlaceId or mod.gameBonus == game.PlaceId then modul.title.TextColor3 = speclColor
+	if (mod.gameSpecific and table.find(mod.gameSpecific, game.PlaceId)) or (mod.gameBonus and table.find(mod.gameBonus, game.PlaceId)) then modul.title.TextColor3 = speclColor
 	elseif mod.isCommunity then modul.title.TextColor3 = communityColor	 end
 	
 	modul.LayoutOrder = imod
@@ -2894,3 +2893,4 @@ game.ReplicatedStorage.disableWurst:Destroy()
 for _, e in pairs(events) do
 	e:Disconnect()
 end
+script.Disabled = true
