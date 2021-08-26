@@ -175,14 +175,15 @@ local function hasChildWithEnding(par, str)
 end
 
 local chld = hasChildWithEnding(plr.PlayerGui, config.gui.ogname)
-if not game:GetService("RunService"):IsStudio() then chld = chld or hasChildWithEnding(coreg.RobloxGui, config.gui.ogname) end
+if not game:GetService("RunService"):IsStudio() then chld = chld or hasChildWithEnding(coreg, config.gui.ogname) end
 
 if chld then
 	log("WurstMod already exists, removing")
 	local disable = Instance.new("BoolValue")
 	disable.Name = "disableWurst"
 	disable.Parent = game.ReplicatedStorage
-	repeat wait() until not plr.PlayerGui:FindFirstChild(config.gui.name)
+	repeat wait() until not hasChildWithEnding(plr.PlayerGui, config.gui.ogname)
+	if not game:GetService("RunService"):IsStudio() then repeat wait() until not hasChildWithEnding(coreg, config.gui.ogname) end
 	wait(0.1)
 end
 
@@ -1381,7 +1382,7 @@ mods = {
 				title = "Fly Speed",
 				value = 60,
 				min = 1,
-				max = 1000
+				max = 50000
 			},
 			altDir = {
 				type = "checkbox",
@@ -1453,6 +1454,7 @@ mods = {
 			
 			if mod.settings.altDir.value then
 				local abc = plr.Character.PrimaryPart:Clone()
+				abc.CFrame = cf -- I'm smart
 				abc.Orientation = Vector3.new(0, abc.Orientation.Y, 0)
 				cf = abc.CFrame
 				abc:Destroy()
@@ -1539,18 +1541,46 @@ mods = {
 		description = "Makes your character spin, flinging everyone.",
 		deathDisable = true,
 		autoEnable = {"nclp"},
-		settings = createOptions(),
+		settings = createOptions({
+			tools = {
+				type = "checkbox",
+				title = "Custom fling for tools",
+				value = true
+			}
+		}),
 		onEnable = function(mod)
 			if not charCheck(plr.Character) then return end
-			local power = 1000000
-			mod.flingVel = Instance.new("BodyAngularVelocity")
-			mod.flingVel.AngularVelocity = Vector3.new(0, power, 0)
-			mod.flingVel.MaxTorque = Vector3.new(0, power, 0)
-			mod.flingVel.Parent = plr.Character.PrimaryPart
+			
+			local tool = plr.Backpack:FindFirstChildOfClass("Tool")
+			if mod.settings.tools.value and tool then
+				plr.Character.Humanoid:UnequipTools()
+				plr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+				tool.Parent = plr.Character
+				
+				local gpos = tool.GripPos
+				
+				local pwr = 25000
+				
+				local p, pY = pwr, pwr / 2
+				
+				tool.GripPos = Vector3.new(p, pY, p)
+				wait(0.35)
+				tool.GripPos = gpos
+				plr.Character.Humanoid:UnequipTools()
+				mod:disable()
+			else
+				local power = 1000000
+				mod.flingVel = Instance.new("BodyAngularVelocity")
+				mod.flingVel.AngularVelocity = Vector3.new(0, power, 0)
+				mod.flingVel.MaxTorque = Vector3.new(0, power, 0)
+				mod.flingVel.Parent = plr.Character.PrimaryPart
+			end
 		end,
 		onDisable = function(mod)
-			mod.flingVel:Destroy()
-			mod.flingVel = nil
+			if mod.flingVel then
+				mod.flingVel:Destroy()
+				mod.flingVel = nil
+			end
 		end,
 	},
 	{
@@ -1578,16 +1608,22 @@ mods = {
 				type = "number",
 				title = "Radius (in studs)",
 				value = 10,
-				min = 25,
-				max = 5000
+				min = 5,
+				max = 50000
 			},
 			sort = {
 				type = "choose",
 				title = "Sort",
 				value = 1,
 				options = {
-					"Nearest"
+					"Nearest",
+					"Player"
 				}
+			},
+			player = {
+				type = "string",
+				title = "Player",
+				value = "Roblox"
 			}
 		}, function(md)
 			if game.PlaceId == 142823291 then
@@ -1599,8 +1635,12 @@ mods = {
 		tick = function(mod)
 			if not charCheck(plr.Character) then return end
 			
+			if mod.settings.sort.value == 2 and not findPlr(mod.settings.player.value, false) then return mod:disable() end
+			
 			local targets = {}
 			for _, pl in pairs(game.Players:GetChildren()) do
+				if mod.settings.sort.value == 2 and mod.settings.player.value == pl.Name and pl.Character and pl.Character.PrimaryPart then table.insert(targets, pl.Name) break end
+			
 				if pl.UserId == plr.UserId then continue end
 				if pl.Character and pl.Character.PrimaryPart then
 					local prm = pl.Character.PrimaryPart
@@ -1633,7 +1673,7 @@ mods = {
 			local target
 			if #targets == 1 then target = targets[1]
 			elseif #targets > 1 then
-				if mod.settings.sort.value == 1 then
+				if mod.settings.sort.value < 3 then
 					table.sort(targets, function(a, b)
 						local function getMgn(pl)
 							local prm = pl.Character.PrimaryPart
@@ -1649,8 +1689,8 @@ mods = {
 					target = targets[1]
 				else
 					for _, x in pairs(targets) do
-						if x.UserId == mm2Data.murderer.UserId and (mod.settings.sort.value == 2) then target = x end
-						if x.UserId == mm2Data.sherrif.UserId and (mod.settings.sort.value == 3) then target = x end
+						if x.UserId == mm2Data.murderer.UserId and (mod.settings.sort.value == 3) then target = x end
+						if x.UserId == mm2Data.sherrif.UserId and (mod.settings.sort.value == 4) then target = x end
 					end
 				end
 			end
@@ -2212,9 +2252,15 @@ mods = {
 				type = "checkbox",
 				title = "Coordinates",
 				value = true
+			},
+			direction = {
+				type = "checkbox",
+				title = "Direction",
+				value = true
 			}
 		}),
 		onEnable = function(mod)
+			mod.fps = 0
 			local dbg = Instance.new("TextLabel")
 			dbg.Name = "debug"
 			dbg.AnchorPoint = Vector2.new(1, 0)
@@ -2232,6 +2278,17 @@ mods = {
 			local dbg = mod.debug
 			dbg.TextSize = dbg.AbsoluteSize.Y * 0.1042
 			
+			if mod.settings.fps.value then
+				spawn(function()
+					mod.fps += 1
+					wait(1)
+					if not mod.settings.fps.value then return end
+					mod.fps -= 1
+				end)
+			else
+				mod.fps = 0
+			end
+			
 			local pos = {}
 			if charCheck(plr.Character) then
 				local ps = plr.Character.PrimaryPart.Position
@@ -2247,8 +2304,13 @@ mods = {
 			}
 			end
 			
+			local y, x, z = workspace.CurrentCamera.CFrame:ToEulerAnglesYXZ()
+			y, x, z = math.deg(y), math.deg(x), math.deg(z)
+			y, x, z = math.floor(y), math.floor(x), math.floor(z)
+			
 			local classes = {}
-			if mod.settings.fps.value then table.insert(classes, string.format("FPS: %s", workspace:GetRealPhysicsFPS())) end
+			if mod.settings.fps.value then table.insert(classes, string.format("FPS: %s", math.floor(math.round(mod.fps / 10) * 10))) end
+			if mod.settings.direction.value then table.insert(classes, string.format("Direction: %s, %s, %s", x, y, z)) end
 			if mod.settings.coordinates.value then table.insert(classes, string.format("Position: %s, %s, %s", pos.X, pos.Y, pos.Z)) end
 			
 			dbg.Text = table.concat(classes, "\n")

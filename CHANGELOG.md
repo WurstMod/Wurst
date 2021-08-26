@@ -6,6 +6,10 @@
 
 - Themes (more in README.md)
 - Community Modules (more in community-modules.lua or README.md)
+- Increased speed limit for Flight
+- New "AltDirections" option for Flight
+- New "Player" sort option for KillAura
+
 - New Modules
   - Debug
   - YoutubeLiveChat
