@@ -4,21 +4,24 @@
 
 ### Added
 
-- Themes (more in README.md)
-- Community Modules (more in community-modules.lua or README.md)
+- Themes (more in [README.md](./README.md))
+- Community Modules (more in [community-modules.lua](./community-modules.lua) or [README.md](./README.md))
 - Increased speed limit for Flight
 - New "AltDirections" option for Flight
 - New "Player" sort option for KillAura
-
 - New Modules
   - Debug
   - YoutubeLiveChat
   - Waypoints
+- New Waypoints
+  - [Doomspire Brickbattle](https://www.roblox.com/games/1215581239)
 
 ### Changed
 
 - Bugfix in InfiniteJump
 - Fixed cloud saving... I think
+- Fixed "Check Walls" in KillAura
+- Fixed ClickToTP / TPToPlayer for R6
 
 ### Coming Soon
 

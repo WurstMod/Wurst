@@ -5,6 +5,7 @@ local pogTemplate = {
     description = "This is a module, and it's very pog!!!", -- The text that appears when you hover over the module
     autoEnable = { "fly" }, -- Automatically enables all mods in this array (by ID)
     deathDisable = true, -- Disables the module once the character dies
+    author = "2658906693|WurstMod", -- Put 'YourRobloxID|YourGithubName' here
     gameSpecific = { 123456789 }, -- Optional | This module will only appear when in specifics games
     gameBonus = { 123456789 }, -- Optional | This module's name will become yellow when in specific games
     settings = createOptions({

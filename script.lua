@@ -1364,6 +1364,7 @@ mods = {
 			end
 
 			plr.Character.PrimaryPart.CFrame = splr.Character.PrimaryPart.CFrame
+			plr.Character:MoveTo(splr.Character.PrimaryPart.CFrame.p)
 
 			if mod.settings.disb.value then
 				mod:disable()
@@ -1591,7 +1592,7 @@ mods = {
 		settings = createOptions({
 			walls = {
 				type = "checkbox",
-				title = "Check Walls (indev)",
+				title = "Check Walls",
 				value = false
 			},
 			looking = {
@@ -1610,6 +1611,20 @@ mods = {
 				value = 10,
 				min = 5,
 				max = 50000
+			},
+			part = {
+				type = "choose",
+				title = "Part",
+				value = 2,
+				options = {
+					"Body",
+					"Head"
+				}
+			},
+			team = {
+				type = "checkbox",
+				title = "Ignore own team",
+				value = true
 			},
 			sort = {
 				type = "choose",
@@ -1635,38 +1650,51 @@ mods = {
 		tick = function(mod)
 			if not charCheck(plr.Character) then return end
 			
-			if mod.settings.sort.value == 2 and not findPlr(mod.settings.player.value, false) then return mod:disable() end
+			local tplr = findPlr(mod.settings.player.value)
+			if mod.settings.sort.value == 2 and not tplr then return mod:disable() end
 			
 			local targets = {}
 			for _, pl in pairs(game.Players:GetChildren()) do
-				if mod.settings.sort.value == 2 and mod.settings.player.value == pl.Name and pl.Character and pl.Character.PrimaryPart then table.insert(targets, pl.Name) break end
-			
-				if pl.UserId == plr.UserId then continue end
-				if pl.Character and pl.Character.PrimaryPart then
-					local prm = pl.Character.PrimaryPart
-					local magnc = (prm.Position - plr.Character.PrimaryPart.Position).Magnitude
-					
-					if magnc > mod.settings.radius.value then continue end
-					
-					local cpos, isCm = workspace.CurrentCamera:WorldToScreenPoint(prm.Position)
-					if not isCm and mod.settings.looking.value then continue end
-					
-					if mod.settings.walls.value then
-						local rDir = workspace.CurrentCamera.CFrame.p - plr.Character.PrimaryPart.Position
-						local raycastParams = RaycastParams.new()
-						raycastParams.FilterDescendantsInstances = plr.Character:GetChildren()
-						raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-						local ray = workspace:Raycast(workspace.CurrentCamera.CFrame.p, rDir, raycastParams)
+				local main
+				if pl.Character then
+					if mod.settings.part.value == 1 then main = pl.Character.PrimaryPart
+					else main = pl.Character:FindFirstChild("Head") end
+				end
+				
+				if mod.settings.sort.value == 2 and tplr == pl.UserId then
+					if pl.Character and main then
+						table.insert(targets, pl)	
+					end
+					break
+				else
+					if mod.settings.team.value and pl.Team and plr.Team and plr.Team == pl.Team then continue end
+					if pl.UserId == plr.UserId then continue end
+					if pl.Character and main then
+						local prm = main
+						local magnc = (prm.Position - plr.Character.PrimaryPart.Position).Magnitude
 						
-						if ray then
-							local prt = ray.Instance
-							if prt then
-								if not table.find(pl.Character:GetDescendants(), prt) then continue end
+						if magnc > mod.settings.radius.value then continue end
+						
+						local cpos, isCm = workspace.CurrentCamera:WorldToScreenPoint(prm.Position)
+						if not isCm and mod.settings.looking.value then continue end
+						
+						if mod.settings.walls.value then
+							local rDir = main.CFrame.p - workspace.CurrentCamera.CFrame.p
+							local raycastParams = RaycastParams.new()
+							raycastParams.FilterDescendantsInstances = plr.Character:GetChildren()
+							raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+							local ray = workspace:Raycast(workspace.CurrentCamera.CFrame.p, rDir, raycastParams)
+							
+							if ray then
+								local prt = ray.Instance
+								if prt then
+									if not table.find(pl.Character:GetDescendants(), prt) then continue end
+								else continue end
 							else continue end
-						else continue end
-					end					
-					
-					table.insert(targets, pl)
+						end					
+						
+						table.insert(targets, pl)
+					end
 				end
 			end
 			
@@ -1762,7 +1790,9 @@ mods = {
 		end,
 		keyPressed = function(mod, k)
 			if tonumber(mod.settings.tpkey.value) == tonumber(k.KeyCode.Value) then
-				plr.Character.PrimaryPart.CFrame = CFrame.new(mod.disc.Position + Vector3.new(0, plr.Character.PrimaryPart.Size.Y, 0))
+				local cfrm = CFrame.new(mod.disc.Position + Vector3.new(0, plr.Character.PrimaryPart.Size.Y, 0))
+				plr.Character.PrimaryPart.CFrame = cfrm
+				plr.Character:MoveTo(cfrm.p)
 			end
 		end
 	},
@@ -2013,18 +2043,24 @@ mods = {
 			mod.brightness = game.Lighting.Brightness
 			mod.outdoorambient = game.Lighting.OutdoorAmbient
 			mod.exposurecompensation = game.Lighting.ExposureCompensation
+			mod.fogEnd = game.Lighting.FogEnd
+			mod.fogStart = game.Lighting.FogStart
 		end,
 		tick = function(mod)
 			game.Lighting.Ambient = Color3.new(1, 1, 1)
 			game.Lighting.Brightness = 3
 			game.Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
 			game.Lighting.ExposureCompensation = 0
+			game.Lighting.FogStart = 0
+			game.Lighting.FogEnd = math.huge
 		end,
 		onDisable = function(mod)
 			game.Lighting.Ambient = mod.ambient
 			game.Lighting.Brightness = mod.brightness 
 			game.Lighting.OutdoorAmbient = mod.outdoorambient
 			game.Lighting.ExposureCompensation = mod.exposurecompensation
+			game.Lighting.FogStart = mod.fogStart
+			game.Lighting.FogEnd = mod.fogEnd
 			
 		end,
 	},
@@ -2216,7 +2252,9 @@ mods = {
 				mod.chr.PrimaryPart.Velocity = Vector3.new()
 				local cfrm = Vector3.new(mod.nchr.PrimaryPart.Position.X, workspace.FallenPartsDestroyHeight + 5, mod.nchr.PrimaryPart.Position.Z)
 				mod.platform.CFrame = CFrame.new(cfrm)
-				mod.chr.PrimaryPart.CFrame = CFrame.new(cfrm + Vector3.new(math.random(-5, 5), 4, math.random(-5, 5)))
+				local cofrm = CFrame.new(cfrm + Vector3.new(math.random(-5, 5), 4, math.random(-5, 5)))
+				mod.chr.PrimaryPart.CFrame = cofrm
+				mod.chr:MoveTo(cofrm.p)
 			end
 			
 			if mod.nchr and mod.nchr.PrimaryPart then
@@ -2232,6 +2270,7 @@ mods = {
 			else cf = mod.cfr end
 			
 			mod.chr.PrimaryPart.CFrame = cf
+			mod.chr:MoveTo(cf.p)
 			
 			workspace.CurrentCamera.CameraSubject = mod.chr.Humanoid
 			plr.Character = mod.chr
@@ -2425,7 +2464,6 @@ mods = {
 									end
 									msg.LayoutOrder = tick()
 									msg.Parent = liveYTChat
-									print(string.format("%s: %s", m.author.name, m.text))
 								end
 							end
 						end
@@ -2464,6 +2502,7 @@ mods = {
 		name = "Waypoints",
 		id = "wponts",
 		description = "Allows you to save a location, and teleport to it",
+		gameBonus = { 1215581239 },
 		settings = createOptions({
 			create = {
 				type = "key",
@@ -2488,14 +2527,22 @@ mods = {
 				value = 0
 			}
 		}, function(md)
-			if game.PlaceId == 142823291 then
-				table.insert(md.points.options, "MM2 Murderer")
-				table.insert(md.points.options, "MM2 Sherrif")
+			if game.PlaceId == 1215581239 then
+				table.insert(md.points.options, "Red Base")
+				table.insert(md.points.options, "Green Base")
+				table.insert(md.points.options, "Yellow Base")
+				table.insert(md.points.options, "Blue Base")
 			end
 		end),
 		saves = {},
 		onEnable = function(mod)
 			mod.parts = {}
+			if game.PlaceId == 1215581239 then
+				mod.saves["Red Base"] = mod.saves["Red Base"] or Vector3.new(-130, 130, 0)
+				mod.saves["Green Base"] = mod.saves["Green Base"] or Vector3.new(0, 130, -130)
+				mod.saves["Yellow Base"] = mod.saves["Yellow Base"] or Vector3.new(130, 130, 0)
+				mod.saves["Blue Base"] = mod.saves["Blue Base"] or Vector3.new(0, 130, 130)
+			end
 			
 			for _, save in pairs(mod.settings.points.options) do
 				local pos = mod.saves[save]
@@ -2537,6 +2584,7 @@ mods = {
 				local nm = mod.settings.points.options[mod.settings.points.value]
 				if nm then
 					plr.Character.PrimaryPart.CFrame = CFrame.new(mod.saves[nm])
+					plr.Character:MoveTo(mod.saves[nm])
 				end
 			end
 		end,
