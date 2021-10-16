@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.6.0 [18/08/2021]
+## v1.6.0 [16/10/2021]
 
 ### Added
 
@@ -21,7 +21,8 @@
 - Bugfix in InfiniteJump
 - Fixed cloud saving... I think
 - Fixed "Check Walls" in KillAura
-- Fixed ClickToTP / TPToPlayer for R6
+- ~~Temporary fix for ClickToTP / TPToPlayer for R6~~
+- **Fixed ClickToTP / TPToPlayer / Flight for R6**
 
 ### Coming Soon
 

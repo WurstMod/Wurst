@@ -258,7 +258,7 @@ gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 if game:GetService("RunService"):IsStudio() then gui.Parent = plr.PlayerGui
 else gui.Parent = coreg end
 
---> THEME_START <--
+--> THEME_START_MAIN <--
 local title = Instance.new("Frame", gui)
 title.Name = "title"
 title.BackgroundTransparency = 1
@@ -702,7 +702,7 @@ waypointBLB_title.TextColor3 = Color3.new(1, 1, 1)
 waypointBLB_title.Text = "Title"
 waypointBLB_title.TextScaled = true
 waypointBLB_title.ZIndex = 2
---> THEME_END <--
+--> THEME_END_MAIN <--
 
 local function drawImage(fram, data)
 	local dt = data
@@ -1121,6 +1121,7 @@ mods = {
 	{
 		name = "Freecam",
 		id = "fcm",
+		category = "Camera",
 		description = "Allows you to move your camera freely.",
 		settings = createOptions(),
 		deathDisable = true,
@@ -1257,7 +1258,7 @@ mods = {
 	{
 		name = "NoClip",
 		id = "nclp",
-		extraLines = 3,
+		category = "Movement",
 		description = "Makes your character no-clip.\n<b>Buggy on terrain!</b>\n<b>Turn off before sitting.</b>",
 		settings = createOptions(),
 		onEnable = function() end,
@@ -1273,6 +1274,7 @@ mods = {
 	{
 		name = "SpeedHack",
 		id = "spdhck",
+		category = "Movement",
 		description = "Allows you to change your character's speed.",
 		settings = createOptions({
 			speed = {
@@ -1303,6 +1305,7 @@ mods = {
 	{
 		name = "JumpHack",
 		id = "jmphck",
+		category = "Movement",
 		description = "Allows you to change your character's jump power.",
 		settings = createOptions({
 			power = {
@@ -1334,6 +1337,7 @@ mods = {
 	{
 		name = "TpToPlayer",
 		id = "plrtp",
+		category = "Movement",
 		description = "Teleports you to a player.",
 		settings = createOptions({
 			disb = {
@@ -1362,9 +1366,8 @@ mods = {
 				mod:disable()
 				return
 			end
-
-			plr.Character.PrimaryPart.CFrame = splr.Character.PrimaryPart.CFrame
-			plr.Character:MoveTo(splr.Character.PrimaryPart.CFrame.p)
+			
+			plr.Character:SetPrimaryPartCFrame(splr.Character.PrimaryPart.CFrame)
 
 			if mod.settings.disb.value then
 				mod:disable()
@@ -1375,6 +1378,7 @@ mods = {
 	{
 		name = "Flight",
 		id = "fly",
+		category = "Movement",
 		description = "Makes you fly.",
 		deathDisable = true,
 		settings = createOptions({
@@ -1480,12 +1484,13 @@ mods = {
 			tweens:Create(mod.flyVel, TweenInfo.new(0.05, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
 				Velocity = vel.p
 			}):Play()
-			plr.Character.PrimaryPart.CFrame = CFrame.new(plr.Character.PrimaryPart.Position, cf:ToWorldSpace(CFrame.new(0, 0, -999999)).p)
+			plr.Character:SetPrimaryPartCFrame(CFrame.new(plr.Character.PrimaryPart.Position, cf:ToWorldSpace(CFrame.new(0, 0, -999999)).p))
 		end,
 	},
 	{
 		name = "Sit",
 		id = "sit",
+		category = "Movement",
 		description = "Makes you sit.",
 		settings = createOptions(),
 		onEnable = function(mod)
@@ -1505,6 +1510,7 @@ mods = {
 	{
 		name = "Spectate",
 		id = "spct",
+		category = "Camera",
 		description = "Makes you spectate another player.",
 		deathDisable = true,
 		settings = createOptions({
@@ -1539,6 +1545,7 @@ mods = {
 	{
 		name = "Fling",
 		id = "flng",
+		category = "Combat",
 		description = "Makes your character spin, flinging everyone.",
 		deathDisable = true,
 		autoEnable = {"nclp"},
@@ -1588,6 +1595,7 @@ mods = {
 		name = "KillAura",
 		gameBonus = { 142823291 },
 		id = "klaura",
+		category = "Combat",
 		description = "Makes your character look at anyone near the radius.",
 		settings = createOptions({
 			walls = {
@@ -1750,6 +1758,7 @@ mods = {
 	{
 		name = "ClickToTP",
 		id = "cttp",
+		category = "Movement",
 		description = "Teleports you to your mouse's position.",
 		settings = createOptions({
 			tpkey = {
@@ -1791,8 +1800,7 @@ mods = {
 		keyPressed = function(mod, k)
 			if tonumber(mod.settings.tpkey.value) == tonumber(k.KeyCode.Value) then
 				local cfrm = CFrame.new(mod.disc.Position + Vector3.new(0, plr.Character.PrimaryPart.Size.Y, 0))
-				plr.Character.PrimaryPart.CFrame = cfrm
-				plr.Character:MoveTo(cfrm.p)
+				plr.Character:SetPrimaryPartCFrame(cfrm)
 			end
 		end
 	},
@@ -1800,6 +1808,7 @@ mods = {
 		name = "PlayerESP",
 		gameBonus = { 142823291 },
 		id = "pesp",
+		category = "UI",
 		description = "See all players through walls, basically like XRay.",
 		settings = createOptions({
 			color = {
@@ -1952,6 +1961,7 @@ mods = {
 	{
 		name = "PlaySound",
 		id = "plsnd",
+		category = "Other",
 		description = "Plays a sound (only for you).",
 		settings = createOptions({
 			sound = {
@@ -2036,6 +2046,7 @@ mods = {
 	{
 		name = "FullBright",
 		id = "flbrht",
+		category = "Camera",
 		description = "Makes your game fullbright (duh).",
 		settings = createOptions(),
 		onEnable = function(mod)
@@ -2067,6 +2078,7 @@ mods = {
 	{
 		name = "InfiniteJump",
 		id = "infjmp",
+		category = "Movement",
 		description = "Allows you to jump infinitely.",
 		settings = createOptions(),
 		onEnable = function(mod)
@@ -2090,6 +2102,7 @@ mods = {
 	{
 		name = "GodMode",
 		id = "godmd",
+		category = "Movement",
 		description = "Makes you invincible (most of the time)",
 		settings = createOptions(),
 		deathDisable = true,
@@ -2111,6 +2124,7 @@ mods = {
 	{
 		name = "BringPlayer",
 		id = "brgplr",
+		category = "Movement",
 		description = "Brings a player to you (most of the time)",
 		settings = createOptions({
 			plr = {
@@ -2170,6 +2184,7 @@ mods = {
 	{
 		name = "AntiAFK",
 		id = "aafk",
+		category = "Other",
 		description = "Forces your player not to get kicked once AFK",
 		settings = createOptions(),
 		onEnable = function(mod)
@@ -2187,6 +2202,7 @@ mods = {
 	{
 		name = "HideGUI",
 		id = "hdgi",
+		category = "UI",
 		description = "Hides the gui. Literally what did you expect. (requires a keybind)",
 		settings = createOptions(),
 		onEnable = function(mod)
@@ -2205,6 +2221,7 @@ mods = {
 	{
 		name = "Invisible",
 		id = "invsb",
+		category = "Movement",
 		deathDisable = true,
 		description = "Makes you invisible (most of the time)",
 		settings = createOptions(),
@@ -2253,8 +2270,7 @@ mods = {
 				local cfrm = Vector3.new(mod.nchr.PrimaryPart.Position.X, workspace.FallenPartsDestroyHeight + 5, mod.nchr.PrimaryPart.Position.Z)
 				mod.platform.CFrame = CFrame.new(cfrm)
 				local cofrm = CFrame.new(cfrm + Vector3.new(math.random(-5, 5), 4, math.random(-5, 5)))
-				mod.chr.PrimaryPart.CFrame = cofrm
-				mod.chr:MoveTo(cofrm.p)
+				mod.chr:SetPrimaryPartCFrame(cofrm)
 			end
 			
 			if mod.nchr and mod.nchr.PrimaryPart then
@@ -2269,8 +2285,7 @@ mods = {
 			if cf then cf = cf.CFrame
 			else cf = mod.cfr end
 			
-			mod.chr.PrimaryPart.CFrame = cf
-			mod.chr:MoveTo(cf.p)
+			mod.chr:SetPrimaryPartCFrame(cf.p)
 			
 			workspace.CurrentCamera.CameraSubject = mod.chr.Humanoid
 			plr.Character = mod.chr
@@ -2280,6 +2295,7 @@ mods = {
 	{
 		name = "Debug",
 		id = "debug",
+		category = "UI",
 		description = "Adds some debug parameters to the corner of your screen",
 		settings = createOptions({
 			fps = {
@@ -2395,6 +2411,7 @@ mods = {
 	{
 		name = "YoutubeLiveChat",
 		id = "ytlivechat",
+		category = "UI",
 		description = "Shows a live chat of a YouTube video",
 		settings = createOptions({
 			id = {
@@ -2501,6 +2518,7 @@ mods = {
 	{
 		name = "Waypoints",
 		id = "wponts",
+		category = "UI",
 		description = "Allows you to save a location, and teleport to it",
 		gameBonus = { 1215581239 },
 		settings = createOptions({
@@ -2532,6 +2550,20 @@ mods = {
 				table.insert(md.points.options, "Green Base")
 				table.insert(md.points.options, "Yellow Base")
 				table.insert(md.points.options, "Blue Base")
+			elseif game.PlaceId == 1224212277 then
+				table.insert(md.points.options, "Hero Base")
+				table.insert(md.points.options, "Villain Lair")
+				table.insert(md.points.options, "Criminal Base")
+				table.insert(md.points.options, "Boat")
+				table.insert(md.points.options, "Tram")
+				table.insert(md.points.options, "Pyramid")
+				table.insert(md.points.options, "Club")
+				table.insert(md.points.options, "Prison")
+				table.insert(md.points.options, "Weapons")
+				table.insert(md.points.options, "Jewel")
+				table.insert(md.points.options, "Bank")
+				table.insert(md.points.options, "Garage")
+				table.insert(md.points.options, "Casino")
 			end
 		end),
 		saves = {},
@@ -2542,6 +2574,21 @@ mods = {
 				mod.saves["Green Base"] = mod.saves["Green Base"] or Vector3.new(0, 130, -130)
 				mod.saves["Yellow Base"] = mod.saves["Yellow Base"] or Vector3.new(130, 130, 0)
 				mod.saves["Blue Base"] = mod.saves["Blue Base"] or Vector3.new(0, 130, 130)
+			elseif game.PlaceId == 1224212277 then
+				mod.saves["Hero Base"] = mod.saves["Hero Base"] or Vector3.new(-825, 346, 810)
+				mod.saves["Villain Lair"] = mod.saves["Villain Lair"] or Vector3.new(-1845, 111, 1505)
+				mod.saves["Criminal Base"] = mod.saves["Criminal Base"] or Vector3.new(2085, 26, 430)
+				mod.saves["Police Base"] = mod.saves["Police Base"] or Vector3.new(-2505, 80, 321)
+				mod.saves["Boat"] = mod.saves["Boat"] or Vector3.new(-1100, 66, -3045)
+				mod.saves["Tram"] = mod.saves["Tram"] or Vector3.new(135, 76, -660)
+				mod.saves["Pyramid"] = mod.saves["Pyramid"] or Vector3.new(-1045, 17, -500)
+				mod.saves["Club"] = mod.saves["Club"] or Vector3.new(1113, 54, 137)
+				mod.saves["Prison"] = mod.saves["Prison"] or Vector3.new(-845, 66, -3150)
+				mod.saves["Weapons"] = mod.saves["Weapons"] or Vector3.new(-1645, 42, -680)
+				mod.saves["Jewel"] = mod.saves["Jewel"] or Vector3.new(-95, 26, 780)
+				mod.saves["Bank"] = mod.saves["Bank"] or Vector3.new(680, 51, 560)
+				mod.saves["Garage"] = mod.saves["Garage"] or Vector3.new(1420, 25, 575)
+				mod.saves["Casino"] = mod.saves["Casino"] or Vector3.new(1700, 35, 670)
 			end
 			
 			for _, save in pairs(mod.settings.points.options) do
@@ -2568,7 +2615,7 @@ mods = {
 			local wpn = waypointBLB:Clone()
 			wpn.Name = save
 			wpn.title.Text = save
-			wpn.distance.BackgroundColor3 = Color3.fromHSV(math.random(0, 255) / 255, 1, 1)
+			wpn.distance.BackgroundColor3 = Color3.fromHSV(math.random(0, 255) / 255, 1, 0.5)
 			wpn.Parent = p
 			table.insert(mod.parts, p)
 		end,
@@ -2583,8 +2630,7 @@ mods = {
 			elseif tonumber(mod.settings.tp.value) == tonumber(k.KeyCode.Value) then
 				local nm = mod.settings.points.options[mod.settings.points.value]
 				if nm then
-					plr.Character.PrimaryPart.CFrame = CFrame.new(mod.saves[nm])
-					plr.Character:MoveTo(mod.saves[nm])
+					plr.Character:SetPrimaryPartCFrame(CFrame.new(mod.saves[nm]))
 				end
 			end
 		end,
@@ -2600,6 +2646,7 @@ mods = {
 	{
 		name = "RoleNotifications",
 		id = "mm2_rlnotif",
+		category = "MM2",
 		description = "[MM2] Sends Notifications everyone round, with who has which role",
 		gameSpecific = { 142823291 },
 		settings = createOptions(),
@@ -2627,6 +2674,7 @@ mods = {
 	{
 		name = "TpToGun",
 		id = "mm2_ttg",
+		category = "MM2",
 		description = "[MM2] Teleports you to the gun",
 		gameSpecific = { 142823291 },
 		settings = createOptions({
@@ -2844,15 +2892,18 @@ for imod, mod in pairs(mods) do
 	modEvs[mod.id] = {}
 	mod.intervals = {}
 	modTogEv[mod.id] = Instance.new("BindableEvent")
+	
+	--> THEME_START_MOD <--
 	local modul = tempModule:Clone()
 	modul.Name = mod.id
 	modul.title.Text = mod.name
+	modul.LayoutOrder = imod
+	modul.Parent = modulesList
+	--> THEME_END_MAIN <--
 	
 	if (mod.gameSpecific and table.find(mod.gameSpecific, game.PlaceId)) or (mod.gameBonus and table.find(mod.gameBonus, game.PlaceId)) then modul.title.TextColor3 = speclColor
 	elseif mod.isCommunity then modul.title.TextColor3 = communityColor	 end
 	
-	modul.LayoutOrder = imod
-	modul.Parent = modulesList
 	
 	local sts = findByKey(gsettings, "id", mod.id)
 	if sts then
