@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.6.0 [16/10/2021]
+## v1.6.0 [8/11/2021]
 
 ### Added
 
@@ -9,6 +9,8 @@
 - Increased speed limit for Flight
 - New "AltDirections" option for Flight
 - New "Player" sort option for KillAura
+- Game-Specific Modules
+  - [Framed](https://www.roblox.com/games/29812337/Framed)
 - New Modules
   - Debug
   - YoutubeLiveChat
@@ -20,6 +22,7 @@
 
 - Bugfix in InfiniteJump
 - Fixed cloud saving... I think
+- Fixed cloud saving, again! (it works now)
 - Fixed "Check Walls" in KillAura
 - ~~Temporary fix for ClickToTP / TPToPlayer for R6~~
 - **Fixed ClickToTP / TPToPlayer / Flight for R6**

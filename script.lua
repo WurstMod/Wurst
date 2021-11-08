@@ -3,7 +3,7 @@ local mouse = plr:GetMouse()
 plr:WaitForChild("PlayerGui")
 if not plr.Character then plr.CharacterAdded:Wait() end
 
-globalUrl = "https://wurst-mod.tk/"
+globalUrl = "https://www.wurst-mod.tk/"
 if game:GetService("RunService"):IsStudio() then 
 	http_request = game.ReplicatedStorage.postWeb
 else
@@ -96,12 +96,13 @@ stringify = function(v, spaces, usesemicolon, depth)
 	return ("%s\n%s}"):format(s:sub(1,-2), space:sub(1, -spaces-1))
 end
 
-local function findPlr(str, multiple)
+local function findPlr(str, multiple, players)
+	local ps = players or game.Players:GetChildren()
 	if multiple then
 		if str:lower() == "me" then return {plr} end
 		if str:lower() == "others" or str:lower() == "other" then
 			local plrs = {}
-			for _, a in pairs(game.Players:GetChildren()) do
+			for _, a in pairs(ps) do
 				if a.UserId ~= plr.UserId then table.insert(plrs, a) end
 			end
 			return plrs
@@ -109,7 +110,7 @@ local function findPlr(str, multiple)
 		if str:lower() == "all" or str:lower() == "everyone" then return game.Players:GetChildren() end
 		
 		local abc = {}
-		for _, p in pairs(game.Players:GetChildren()) do
+		for _, p in pairs(ps) do
 			if p.Name:lower() == str:lower() or
 				p.DisplayName:lower() == str:lower() or
 				p.UserId == str then
@@ -121,13 +122,11 @@ local function findPlr(str, multiple)
 	else
 		if str:lower() == "me" then return plr end
 
-		for _, p in pairs(game.Players:GetChildren()) do
-			for _, p in pairs(game.Players:GetChildren()) do
-				if p.Name:lower() == str:lower() or
-					p.DisplayName:lower() == str:lower() or
-					p.UserId == str then
-					return p
-				end
+		for _, p in pairs(ps) do
+			if p.Name:lower() == str:lower() or
+				p.DisplayName:lower() == str:lower() or
+				p.UserId == str then
+				return p
 			end
 		end
 	end
@@ -761,15 +760,17 @@ local function saveSettings()
 		id = x.id,
 		settings = x.settings
 	}) end
+	local H = httpr:JSONEncode({
+		data = combined,
+		uid = plr.UserId
+	})
 	local dat = {
 		Url = globalUrl .. "api/setSettings?uid=" .. plr.UserId,
 		Method = "POST",
 		Headers = {
 			["Content-Type"] = "application/json"
 		},
-		Body = httpr:JSONEncode({
-			data = combined
-		})
+		Body = H
 	}
 	
 	if game:GetService("RunService"):IsStudio() then http_request:InvokeServer(dat)
@@ -1013,7 +1014,87 @@ local mm2Evs = {
 	notifications = Instance.new("BindableEvent")
 }
 
-if game.PlaceId == 142823291 then
+local framedData = {
+	target = nil,
+	role = nil,
+	gamemode = nil,
+	map = nil
+}
+local framedEvs = {
+	notifications = Instance.new("BindableEvent")
+}
+
+if game.PlaceId == 6872608338 then
+	local function maap(b)
+		if b then return b.Name end
+		
+		return nil
+	end
+	
+	framedData.gamemode = workspace.Values.GameMode.Value
+	framedData.map = maap(workspace.Values.Map.Value)
+	
+	if plr.Team.Name ~= "Lobby" then
+		framedData.target = workspace.Events.GetTargetLocal:InvokeServer()
+		framedData.role = workspace.Events.GetRoleLocal:InvokeServer()
+	end
+
+	workspace.Values.GameMode:GetPropertyChangedSignal("Value"):Connect(function()
+		framedData.gamemode = workspace.Values.GameMode.Value
+	end)
+	workspace.Values.Map:GetPropertyChangedSignal("Value"):Connect(function()
+		framedData.map = maap(workspace.Values.Map.Value)
+		if not framedData.map then
+			framedEvs.notifications:Fire("GameNotifications", "The round has ended!")
+		else
+			framedEvs.notifications:Fire("GameNotifications", ("The round has started! Current map: %s"):format(framedData.map))
+		end
+	end)
+	
+	workspace.Events.Notify.OnClientEvent:Connect(function(msg)
+		if plr.Team.Name == "Lobby" then return end
+		if msg == "newTarget" then
+			framedData.target = workspace.Events.GetTargetLocal:InvokeServer()
+			local function h(pl)
+				framedEvs.notifications:Fire(
+					"GameNotifications",
+					("%s is your target!"):format(pl.Name),
+					("rbxthumb://type=AvatarHeadShot&id=%s&w=%s&h=%s"):format(
+						pl.UserId,
+						352,
+						352
+					),
+					35
+				)
+			end
+			
+			if type (framedData.target) == "table" then for _, H in pairs(framedData.target) do h(H) end
+			elseif framedData.target then h(framedData.target) end
+		elseif msg == "newHunter" then
+			-- GetHunter exists but idk how that works lmao
+		end
+	end)
+	
+	workspace.Events.GameStart.OnClientEvent:Connect(function(role, ...)
+		framedData.role = role
+		framedData.target = workspace.Events.GetTargetLocal:InvokeServer()
+		local function h(pl)
+			framedEvs.notifications:Fire(
+				"GameNotifications",
+				("%s is your target!"):format(pl.Name),
+				("rbxthumb://type=AvatarHeadShot&id=%s&w=%s&h=%s"):format(
+					pl.UserId,
+					352,
+					352
+				),
+				35
+			)
+		end
+
+		if type (framedData.target) == "table" then for _, H in pairs(framedData.target) do h(H) end
+		elseif framedData.target then h(framedData.target) end
+	end)
+elseif game.PlaceId == 142823291 then
 	local tmr = game.ReplicatedStorage.GetTimer:InvokeServer()
 	
 	local tev
@@ -1593,7 +1674,7 @@ mods = {
 	},
 	{
 		name = "KillAura",
-		gameBonus = { 142823291 },
+		gameBonus = { 142823291, 6872608338 },
 		id = "klaura",
 		category = "Combat",
 		description = "Makes your character look at anyone near the radius.",
@@ -1652,6 +1733,8 @@ mods = {
 			if game.PlaceId == 142823291 then
 				table.insert(md.sort.options, "MM2 Murderer")
 				table.insert(md.sort.options, "MM2 Sherrif")
+			elseif game.PlaceId == 6872608338 then
+				table.insert(md.sort.options, "Framed Target")
 			end
 		end),
 		onEnable = function() end,
@@ -1707,8 +1790,7 @@ mods = {
 			end
 			
 			local target
-			if #targets == 1 then target = targets[1]
-			elseif #targets > 1 then
+			if true then
 				if mod.settings.sort.value < 3 then
 					table.sort(targets, function(a, b)
 						local function getMgn(pl)
@@ -1723,10 +1805,18 @@ mods = {
 						return bMgn > aMgn
 					end)
 					target = targets[1]
-				else
+				elseif game.PlaceId == 142823291 then
 					for _, x in pairs(targets) do
 						if x.UserId == mm2Data.murderer.UserId and (mod.settings.sort.value == 3) then target = x end
 						if x.UserId == mm2Data.sherrif.UserId and (mod.settings.sort.value == 4) then target = x end
+					end
+				elseif game.PlaceId == 6872608338 then
+					local ids = {}
+					if type(framedData.target) == "table" then for _, H in pairs(framedData.target) do table.insert(ids, H.UserId) end
+					elseif framedData.target then ids = {framedData.target.UserId} end
+					for _, x in pairs(targets) do
+						print(unpack(ids), x.UserId, #ids)
+						if table.find(ids, x.UserId) and (mod.settings.sort.value == 3) then target = x end
 					end
 				end
 			end
@@ -1806,7 +1896,7 @@ mods = {
 	},
 	{
 		name = "PlayerESP",
-		gameBonus = { 142823291 },
+		gameBonus = { 142823291, 6872608338 },
 		id = "pesp",
 		category = "UI",
 		description = "See all players through walls, basically like XRay.",
@@ -1836,6 +1926,8 @@ mods = {
 		}, function(md)
 			if game.PlaceId == 142823291 then
 				table.insert(md.color.options, "MM2 Role")
+			elseif game.PlaceId == 6872608338 then
+				table.insert(md.color.options, "Framed Role")
 			end
 		end),
 		onEnable = function(mod)
@@ -1849,6 +1941,7 @@ mods = {
 				Color3.fromRGB(0, 255, 0),
 				Color3.fromRGB(255, 255, 0),
 				Color3.fromRGB(0, 0, 0),
+				nil,
 				nil,
 				nil
 			}
@@ -1917,10 +2010,22 @@ mods = {
 					espColor = pl.TeamColor.Color
 				elseif mod.settings.color.value == 10 then
 					espColor = Color3.fromHSV(mod.rainbowHue, 1, 1)
-				elseif mod.settings.color.value == 11 then
+				elseif mod.settings.color.value == 11 and game.PlaceId == 142823291 then
 					if mm2Data.sherrif and (mm2Data.sherrif.UserId == pl.UserId) then espColor = Color3.new(0, 0, 1)
 					elseif mm2Data.murderer and (mm2Data.murderer.UserId == pl.UserId) then espColor = Color3.new(1, 0, 0)
 					else espColor = Color3.new(0, 1, 0) end
+				elseif mod.settings.color.value == 11 and game.PlaceId == 6872608338 then
+					local ids = {}
+					if type(framedData.target) == "table" then for _, H in pairs(framedData.target) do table.insert(ids, H.UserId) end
+					elseif framedData.target then ids = {framedData.target.UserId} end
+					
+					if table.find(ids, pl.UserId) then espColor = Color3.new(1, 0.305882, 0.0313725) 
+					elseif pl.Team.Name == "Lobby" then espColor = Color3.new(0.262745, 0.262745, 0.262745)
+					elseif pl.Team.Name == "Framed" then
+						if pl.Backpack:FindFirstChild("Police Badge") or pl.Character:FindFirstChild("Police Badge") then espColor = Color3.new(0, 0.917647, 1)
+						else espColor = Color3.new(1, 0.74902, 0) end
+					elseif pl.Team.Name == "Police" then espColor = Color3.new(0, 0.431373, 1)
+					else espColor = pl.Team.TeamColor.Color end
 				else
 					espColor = mod.colors[mod.settings.color.value]
 				end
@@ -1943,7 +2048,7 @@ mods = {
 							prt.Material = Enum.Material.SmoothPlastic
 							prt.Parent = lel
 							prt.Anchored = true
-							if xd.Transparency > 0.5 then prt.Transparency = 0
+							if xd.Transparency > 0.5 then prt.Transparency = 1
 							else prt.Transparency = 0 end
 							mod.parts[xd] = prt
 						end
@@ -2644,10 +2749,54 @@ mods = {
 		end,
 	},
 	{
+		name = "GameNotifications",
+		id = "framed_gnotif",
+		category = "Framed",
+		description = "[Framed] Sends Notifications every round, with information about targets, etc.",
+		gameSpecific = { 6872608338 },
+		settings = createOptions(),
+		onEnable = function(mod)
+			mod.ev = framedEvs.notifications.Event:Connect(function(ttl, txt, img, time)
+				pcall(game.StarterGui.SetCore, game.StarterGui, "SendNotification", {
+					Title = ttl,
+					Text = txt,
+					Icon = img,
+					Duration = 5 or time
+				})
+			end)
+			table.insert(events, mod.ev)
+			
+			if framedData.target then
+				local function h(H)
+					framedEvs.notifications:Fire(
+						"GameNotifications",
+						("%s is your target!"):format(H.Name),
+						("rbxthumb://type=AvatarHeadShot&id=%s&w=%s&h=%s"):format(
+						H.UserId,
+						352,
+						352
+						)
+					)
+				end
+
+				if type(framedData.target) == "table" then for _, H in pairs(framedData.target) do h(H) end
+				elseif framedData.target then h(framedData.target) end
+			end
+			if not framedData.map then
+				framedEvs.notifications:Fire("GameNotifications", "Waiting for the round to start")
+			else
+				framedEvs.notifications:Fire("GameNotifications", ("Current map: %s"):format(framedData.map))
+			end
+		end,
+		onDisable = function(mod)
+			mod.ev:Disconnect()
+		end
+	},
+	{
 		name = "RoleNotifications",
 		id = "mm2_rlnotif",
 		category = "MM2",
-		description = "[MM2] Sends Notifications everyone round, with who has which role",
+		description = "[MM2] Sends Notifications every round, with who has which role",
 		gameSpecific = { 142823291 },
 		settings = createOptions(),
 		onEnable = function(mod)
@@ -2718,7 +2867,102 @@ mods = {
 			mod:disable()
 			return
 		end,
+		onDisable = function() end
 	},
+	{
+		name = "InstaKill",
+		id = "framed_ik",
+		category = "Framed",
+		description = "[Framed] Backstabs someone (requires any Knife)",
+		gameSpecific = { 6872608338 },
+		settings = createOptions({
+			filter = {
+				type = "choose",
+				title = "Player Filter",
+				value = 1,
+				options = {
+					"Random",
+					"Player",
+					"Framed Target",
+					"Police",
+					"Framed"
+				}
+			},
+			player = {
+				type = "string",
+				title = "Player",
+				value = "Roblox"
+			}
+		}),
+		onEnable = function(mod)
+			local plors = {}
+			for _, p in pairs(game.Players:GetChildren()) do
+				if p.Character and p.UserId ~= plr.UserId then table.insert(plors, p) end 	
+			end
+				
+			if #plors == 0 then return end
+			
+			local plor
+			if mod.settings.filter.value == 1 then
+				plor = plors[math.random(1, #plors)]
+			elseif mod.settings.filter.value == 2 then
+				plor = findPlr(mod.settings, false, plors)
+				if not plor or plor.UserId == plr.UserId then plor = nil end
+			elseif mod.settings.filter.value == 3 then
+				if type(framedData.target) == "table" then for _, h in pairs(framedData.target) do if h.Character then plor = h end end
+				else plor = framedData.target end
+			else
+				for _, p in pairs(plors) do
+					if p.Character and p.Team.Name == mod.settings.filter.options[mod.settings.filter.value] and not plor then plor = p end
+				end
+			end
+			
+			if not plor then mod:disable() return end
+			
+			local tool
+			for _, x in pairs(plr.Backpack:GetChildren()) do
+				if x.Name:match("Knife") then tool = x end
+			end
+			for _, x in pairs(plr.Character:GetChildren()) do
+				if x.Name:match("Knife") and x:IsA("Tool") then tool = x end
+			end
+			
+			if not tool then mod:disable() return end
+			
+			if tool.Parent == plr.Backpack then
+				plr.Character.Humanoid:EquipTool(tool)
+				plr.Character:WaitForChild(tool.Name)
+				wait()
+			end
+			
+			local cfr = plr.Character.PrimaryPart.CFrame
+			local CFR = workspace.CurrentCamera.CFrame
+			local asd = CFrame.new(
+				plor.Character.PrimaryPart.CFrame:ToWorldSpace(CFrame.new(0, 0, 2)).p,
+				plor.Character.PrimaryPart.Position
+			)
+			
+			local pistol = plr.Character:WaitForChild(tool.Name)
+			
+			plr.Character:SetPrimaryPartCFrame(asd)
+			workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.p, plor.Character.PrimaryPart.Position)
+			wait(0.01)
+			workspace.Events.Shoot:FireServer(
+				Ray.new(pistol.Handle.Position, (plor.Character.PrimaryPart.Position - pistol.Handle.Position)),
+				plor.Character.PrimaryPart,
+				plor.Character.PrimaryPart.Position,
+				pistol,
+				false
+			)
+			wait(0.01)
+			
+			plr.Character:SetPrimaryPartCFrame(cfr)
+			workspace.CurrentCamera.CFrame = CFR
+			plr.Character.Humanoid:UnequipTools()
+			mod:disable()
+		end,
+		onDisable = function() end
+	}
 
 	--> COMMUNITY_MODULES <--
 	--> COMMUNITY_MODULES_END <--
